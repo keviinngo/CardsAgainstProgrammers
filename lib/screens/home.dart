@@ -6,8 +6,32 @@ class HomeScreen extends StatelessWidget{
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Text('Homepage :)')
+        child: Column(
+          children: <Widget>[
+            titleCard()
+          ],
+        )
       ),
+    );
+  }
+
+  Widget titleCard() {
+    return (
+      SafeArea(
+        child: AspectRatio(
+          aspectRatio: 88 / 63,
+          child: FractionallySizedBox(
+            widthFactor: 0.8,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.black,
+                border: Border.all(),
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+              ),
+            )
+          )
+        ),
+      )
     );
   }
 }
