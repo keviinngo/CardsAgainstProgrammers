@@ -21,13 +21,13 @@ class HomeScreen extends StatelessWidget{
       SafeArea(
         // Will not draw out on top of notch.
         child: AspectRatio(
-          // Aspect ratio of the card.
+          // Aspect ratio of the card
           aspectRatio: 1.8 / 1,
           child: FractionallySizedBox(
             widthFactor: 0.9,
             child: Container(
               constraints: BoxConstraints(
-                //Max width of card.
+                // Max width of the container
                 maxWidth: 500
               ),
               decoration: BoxDecoration(
