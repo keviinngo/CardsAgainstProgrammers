@@ -23,8 +23,12 @@ class RootScreen extends StatelessWidget {
         '/create': (context) => CreateScreen(),
       },
       theme: ThemeData(
-        backgroundColor: Colors.white
+        primaryColor: Colors.black,
       )
+      /*ThemeData(
+        backgroundColor: Colors.white
+        
+      )*/
     );
   }
 }
