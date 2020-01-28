@@ -15,6 +15,7 @@ class UppercaseInputFormatter extends TextInputFormatter {
 class JoinScreen extends StatelessWidget {
   final TextEditingController codeController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   Widget buildCodeField() {
     return TextFormField(
@@ -33,23 +34,27 @@ class JoinScreen extends StatelessWidget {
       enableSuggestions: false,
       textCapitalization: TextCapitalization.characters,
       keyboardType: TextInputType.text,
+      validator: (str) {
+        return str.length != 4 ? "Code too short" : null;
+      },
     );
   }
 
   Widget buildNameField() {
     return TextFormField(
       controller: nameController,
-      maxLength: 32,
+      maxLength: 64,
       maxLengthEnforced: true,
       textAlign: TextAlign.center,
       decoration: InputDecoration(
         hintText: 'Name',
         border: OutlineInputBorder(),
       ),
-      inputFormatters: [
-        WhitelistingTextInputFormatter(RegExp(r"[\p{Letter}]*", unicode: true)),
-      ],
+      inputFormatters: [],
       enableSuggestions: true,
+      validator: (str) {
+        return str.isEmpty ? "Need a name" : null;
+      },
     );
   }
 
@@ -64,19 +69,25 @@ class JoinScreen extends StatelessWidget {
           constraints: BoxConstraints(
             maxWidth: 400,
           ),
-          child: Column(
-            children: [
-              Padding(padding: EdgeInsets.only(top: 40),),
-              buildCodeField(),
-              buildNameField(),
-              RaisedButton(
-                child: Text('Join'),
-                onPressed: () {
-                  print("Join ${codeController.text} as ${nameController.text}");
-                },
-              )
-            ]
-          ),
+          child: Form(
+            key: formKey,
+            child: Column(
+              children: [
+                Padding(padding: EdgeInsets.only(top: 40),),
+                buildCodeField(),
+                Padding(padding: EdgeInsets.only(top: 20),),
+                buildNameField(),
+                RaisedButton(
+                  child: Text('Join'),
+                  onPressed: () {
+                    if (formKey.currentState.validate()) {
+                      print("Join ${codeController.text} as ${nameController.text}");
+                    }
+                  },
+                )
+              ]
+            ),
+          )
         )
       ),
     );
