@@ -19,15 +19,22 @@ class HomeScreen extends StatelessWidget{
     return (
       SafeArea(
         child: AspectRatio(
-          aspectRatio: 88 / 63,
+          aspectRatio: 1.8 / 1,
           child: FractionallySizedBox(
-            widthFactor: 0.8,
+            widthFactor: 0.9,
             child: Container(
+              constraints: BoxConstraints(maxWidth: 500),
               decoration: BoxDecoration(
                 color: Colors.black,
                 border: Border.all(),
                 borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
+              child: Center(
+                child: Text(
+                  'Cards Against Programmers\nI want to _____ a game.',
+                  style: TextStyle(color: Colors.white, fontSize: 26), textAlign: TextAlign.center,
+                ),
+              )
             )
           )
         ),
