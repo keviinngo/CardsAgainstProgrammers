@@ -46,6 +46,12 @@ class CreateScreen extends StatelessWidget {
                   onPressed: () {
                     if (formKey.currentState.validate()) {
                       print("Create game as ${nameController.text}");
+                      Navigator.of(context).pushReplacementNamed(
+                        '/lobby',
+                        arguments: {
+                          'username': nameController.text,
+                        }
+                      );
                     }
                   },
                 ),

@@ -1,4 +1,5 @@
 import 'package:cap/screens/join.dart';
+import 'package:cap/screens/lobby.dart';
 import 'package:flutter/material.dart';
 import 'package:cap/screens/home.dart';
 import 'package:cap/screens/create.dart';
@@ -21,6 +22,7 @@ class RootScreen extends StatelessWidget {
         '/': (context) => HomeScreen(),
         '/join': (context) => JoinScreen(),
         '/create': (context) => CreateScreen(),
+        '/lobby': (context) => LobbyScreen(arguments: ModalRoute.of(context).settings.arguments as Map<String, dynamic>),
       },
       theme: ThemeData(
         primaryColor: Colors.black,
