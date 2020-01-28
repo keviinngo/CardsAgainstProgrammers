@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:cap/screens/home.dart';
 
+// Runs MyApp.
 void main() => runApp(MyApp());
 
+/// Main entrypoint. 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
@@ -11,22 +14,13 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         // When navigating to the "/" route, build the HomePage widget.
+        // 
+        // List of all routes in the application.
         '/': (context) => HomePage(),
       },
       theme: ThemeData(
         backgroundColor: Colors.white
       )
-    );
-  }
-}
-
-class HomePage extends StatelessWidget{
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Text('Homepage')
-      ),
     );
   }
 }
