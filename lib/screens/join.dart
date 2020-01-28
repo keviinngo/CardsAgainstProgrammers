@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 
+/// TextInputFormatter that makes sure all letters are capitalized.
 class UppercaseInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
@@ -84,7 +85,7 @@ class JoinScreen extends StatelessWidget {
                       print("Join ${codeController.text} as ${nameController.text}");
                     }
                   },
-                )
+                ),
               ]
             ),
           )
