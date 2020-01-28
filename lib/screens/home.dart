@@ -16,14 +16,20 @@ class HomeScreen extends StatelessWidget{
   }
 
   Widget titleCard() {
+    /// Black titlecard with the text: Cards Against Programmers \n I want to _____ a game.
     return (
       SafeArea(
+        // Will not draw out on top of notch.
         child: AspectRatio(
+          // Aspect ratio of the card.
           aspectRatio: 1.8 / 1,
           child: FractionallySizedBox(
             widthFactor: 0.9,
             child: Container(
-              constraints: BoxConstraints(maxWidth: 500),
+              constraints: BoxConstraints(
+                //Max width of card.
+                maxWidth: 500
+              ),
               decoration: BoxDecoration(
                 color: Colors.black,
                 border: Border.all(),
