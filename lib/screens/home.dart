@@ -33,7 +33,7 @@ class HomeScreen extends StatelessWidget{
           // Aspect ratio of the card
             aspectRatio: 1.8 / 1,
             child: FractionallySizedBox(
-              widthFactor: 0.9,
+              heightFactor: 0.8,
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.black,
