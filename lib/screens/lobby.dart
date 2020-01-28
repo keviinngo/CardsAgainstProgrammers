@@ -19,6 +19,8 @@ class LobbyScreenState extends State<LobbyScreen> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final GlobalKey kickYourselfSnackbarKey = GlobalKey();
 
+  final int maxPlayers = 16;
+
   List<String> players = List<String>();
   String hostName;
 
@@ -28,8 +30,18 @@ class LobbyScreenState extends State<LobbyScreen> {
     hostName = widget.arguments['username'];
     players = [
       widget.arguments['username'],
-      'byggmester bob',
-      'byggmester bob',
+      'Tosha',
+      'Von',
+      'Renee',
+      'Chet',
+      'Stephany',
+      'Lolita',
+      'Roseanne',
+      'Delphia',
+      'Jacquline',
+      'Un',
+      'Martin',
+      'Simonne',
     ];
   }
 
@@ -69,6 +81,30 @@ class LobbyScreenState extends State<LobbyScreen> {
     );
   }
 
+  Widget buildItem(BuildContext context, int index) {
+    return Dismissible(
+      key: GlobalKey(),
+      background: Container(
+        color: Colors.red,
+      ),
+      onDismissed: (DismissDirection direction) {
+        setState((){
+          players.remove(players[index]);
+        });
+      },
+      confirmDismiss: (direction) async => confirmKick(context,index),
+      child: Column(
+        children: [
+          ListTile(
+            title: Text(players[index]),
+            subtitle: Text('Swipe to kick', style: TextStyle(fontSize: 10),),
+          ),
+          Divider(),
+        ]
+      )
+    );
+  }
+
   Widget buildPlayerList() {
     return Container(
       decoration: BoxDecoration(
@@ -82,27 +118,7 @@ class LobbyScreenState extends State<LobbyScreen> {
         shrinkWrap: false,
         scrollDirection: Axis.vertical,
         itemCount: players.length,
-        itemBuilder: (context, index) {
-          return Dismissible(
-            key: GlobalKey(),
-            background: Container(
-              color: Colors.red,
-            ),
-            onDismissed: (DismissDirection direction) {
-              players.removeAt(index);
-            },
-            confirmDismiss: (direction) async => confirmKick(context,index),
-            child: Column(
-              children: [
-                ListTile(
-                  title: Text(players[index]),
-                  subtitle: Text('Swipe to kick'),
-                ),
-                Divider(),
-              ]
-            )
-          );
-        }, 
+        itemBuilder: (context, index) => buildItem(context, index),
       ),
     );
   }
@@ -135,7 +151,7 @@ class LobbyScreenState extends State<LobbyScreen> {
               Padding(
                 padding: EdgeInsets.all(5),
                 child: Text(
-                  'Players',
+                  'Players (${players.length}/$maxPlayers)',
                   style:  TextStyle(
                     fontSize: 24,
                   ),
