@@ -1,6 +1,7 @@
 import 'package:cap/screens/join.dart';
 import 'package:flutter/material.dart';
 import 'package:cap/screens/home.dart';
+import 'package:cap/screens/create.dart';
 
 // Runs MyApp.
 void main() => runApp(RootScreen());
@@ -19,6 +20,7 @@ class RootScreen extends StatelessWidget {
         // List of all routes in the application.
         '/': (context) => HomeScreen(),
         '/join': (context) => JoinScreen(),
+        '/create': (context) => CreateScreen(),
       },
       theme: ThemeData(
         backgroundColor: Colors.white
