@@ -6,10 +6,16 @@ class HomeScreen extends StatelessWidget{
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Column(
+        child: Flex(
+          direction: Axis.vertical,
           children: <Widget>[
+            Spacer(flex: 5),
             titleCard(),
-            joinButton()
+            Spacer(flex: 10),
+            joinButton(context),
+            Spacer(flex: 5),
+            createButton(context),
+            Spacer(flex: 50)
           ],
         )
       ),
@@ -49,27 +55,49 @@ class HomeScreen extends StatelessWidget{
     );
   }
 
-  Widget joinButton() {
-    return(
-      Container(
-        margin: EdgeInsets.all(12),
-        height: 50,
-        width: 100,
-        decoration: BoxDecoration(boxShadow: [
-          BoxShadow(
-            color: Colors.black, blurRadius: 4, offset: Offset(0, 2)
+  Widget joinButton(context) {
+    return InkWell(
+      borderRadius: BorderRadius.all(Radius.circular(10)),
+      onTap: (() {
+        Navigator.pushReplacementNamed(context, '/join');
+      }),
+      child: Ink(
+        width: 160,
+        height: 90,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: Colors.black, style: BorderStyle.solid, width: 0.5),
+          borderRadius: BorderRadius.all(Radius.circular(10))
+        ),
+        child: Center(
+          child: Text(
+            'Join',
+            textAlign: TextAlign.center,
           ),
-        ]),
-        child: Material(
-          color: Colors.black,
-          child: InkWell(
-              onTap: () {},
-            child: Center(
-             child: Text("Test",
-              style: TextStyle(color: Colors.white),
-              ),
-            )
-          )
+        )
+      )
+    );
+  }
+
+  Widget createButton(context) {
+    return InkWell(
+      borderRadius: BorderRadius.all(Radius.circular(10)),
+      onTap: (() {
+        Navigator.pushReplacementNamed(context, '/create');
+      }),
+      child: Ink(
+        width: 160,
+        height: 90,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: Colors.black, style: BorderStyle.solid, width: 0.5),
+          borderRadius: BorderRadius.all(Radius.circular(10))
+        ),
+        child: Center(
+          child: Text(
+            'Create',
+            textAlign: TextAlign.center,
+          ),
         )
       )
     );
