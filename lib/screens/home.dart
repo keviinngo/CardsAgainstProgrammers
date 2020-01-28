@@ -27,34 +27,34 @@ class HomeScreen extends StatelessWidget{
     return (
       SafeArea(
         // Will not draw out on top of notch.
-        child: AspectRatio(
+        child: Container(
+          constraints: BoxConstraints(maxWidth: 500),
+          child: AspectRatio(
           // Aspect ratio of the card
-          aspectRatio: 1.8 / 1,
-          child: FractionallySizedBox(
-            widthFactor: 0.9,
-            child: Container(
-              constraints: BoxConstraints(
-                // Max width of the container
-                maxWidth: 500
-              ),
-              decoration: BoxDecoration(
-                color: Colors.black,
-                border: Border.all(),
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-              ),
-              child: Center(
-                child: Text(
-                  'Cards Against Programmers\nI want to _____ a game.',
-                  style: TextStyle(color: Colors.white, fontSize: 26), textAlign: TextAlign.center,
+            aspectRatio: 1.8 / 1,
+            child: FractionallySizedBox(
+              widthFactor: 0.9,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  border: Border.all(),
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),
+                child: Center(
+                  child: Text(
+                    'Cards Against Programmers\nI want to _____ a game.',
+                    style: TextStyle(color: Colors.white, fontSize: 26), textAlign: TextAlign.center,
+                  ),
+                )
               )
             )
-          )
-        ),
+          ),
+        )
       )
     );
   }
 
+  // TODO: Aspecratio
   Widget joinButton(context) {
     return InkWell(
       borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -79,6 +79,7 @@ class HomeScreen extends StatelessWidget{
     );
   }
 
+  // TODO: Aspect ratio
   Widget createButton(context) {
     return InkWell(
       borderRadius: BorderRadius.all(Radius.circular(10)),
