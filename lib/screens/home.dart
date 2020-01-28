@@ -34,6 +34,7 @@ class HomeScreen extends StatelessWidget{
             aspectRatio: 1.8 / 1,
             child: FractionallySizedBox(
               heightFactor: 0.8,
+              widthFactor: 0.9,
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.black,
@@ -59,7 +60,7 @@ class HomeScreen extends StatelessWidget{
     return InkWell(
       borderRadius: BorderRadius.all(Radius.circular(10)),
       onTap: (() {
-        Navigator.pushReplacementNamed(context, '/join');
+        Navigator.pushNamed(context, '/join');
       }),
       child: Ink(
         width: 160,
@@ -84,7 +85,7 @@ class HomeScreen extends StatelessWidget{
     return InkWell(
       borderRadius: BorderRadius.all(Radius.circular(10)),
       onTap: (() {
-        Navigator.pushReplacementNamed(context, '/create');
+        Navigator.pushNamed(context, '/create');
       }),
       child: Ink(
         width: 160,
