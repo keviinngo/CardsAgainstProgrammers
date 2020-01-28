@@ -8,7 +8,8 @@ class HomeScreen extends StatelessWidget{
       body: Center(
         child: Column(
           children: <Widget>[
-            titleCard()
+            titleCard(),
+            joinButton()
           ],
         )
       ),
@@ -44,6 +45,32 @@ class HomeScreen extends StatelessWidget{
             )
           )
         ),
+      )
+    );
+  }
+
+  Widget joinButton() {
+    return(
+      Container(
+        margin: EdgeInsets.all(12),
+        height: 50,
+        width: 100,
+        decoration: BoxDecoration(boxShadow: [
+          BoxShadow(
+            color: Colors.black, blurRadius: 4, offset: Offset(0, 2)
+          ),
+        ]),
+        child: Material(
+          color: Colors.black,
+          child: InkWell(
+              onTap: () {},
+            child: Center(
+             child: Text("Test",
+              style: TextStyle(color: Colors.white),
+              ),
+            )
+          )
+        )
       )
     );
   }
