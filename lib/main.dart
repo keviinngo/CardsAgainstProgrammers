@@ -1,3 +1,4 @@
+import 'package:cap/screens/join.dart';
 import 'package:flutter/material.dart';
 import 'package:cap/screens/home.dart';
 
@@ -17,6 +18,7 @@ class MyApp extends StatelessWidget {
         // 
         // List of all routes in the application.
         '/': (context) => HomePage(),
+        '/join': (context) => JoinScreen(),
       },
       theme: ThemeData(
         backgroundColor: Colors.white
