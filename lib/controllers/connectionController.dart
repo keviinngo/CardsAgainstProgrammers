@@ -5,6 +5,7 @@ const String SERVER_ADDRESS = "192.168.10.186";
 const String SERVER_PATH = "/game";
 const int SERVER_PORT = 8080;
 
+/// All the possibe states the client can be in.
 enum ConnectionState {
   waitingForHello,
   creatingGame,
@@ -12,6 +13,9 @@ enum ConnectionState {
   joiningGame,
 }
 
+///
+/// An object with a connection to the server and all the relevant information for the game
+/// 
 class Connection {
   final WebSocket socket;
   ConnectionState state = ConnectionState.waitingForHello;
@@ -21,19 +25,30 @@ class Connection {
   bool isHost;
   bool inLobby;
 
+  /// The callback that is called when a player joins the game.
   void Function(String) onJoin;
+  /// The callback that is called when a player leaves the game.
   void Function(String) onLeft;
+  /// The callback that is called when a game is created.
   void Function() onGameCreated;
+  /// The callback that is called when you join a game.
   void Function(List<String>) onJoinedGame;
 
+  /// Connection constructor.
+  /// 
+  /// Takes in arguments [socket], [isHost] and [username].
+  ///
+  /// named argument [code]
   Connection(this.socket, this.isHost, this.username, {this.code}) {
     socket.listen(onData);
   }
 
+  /// Sends an json object to the server.
   void sendJson(Object obj) {
     socket.addUtf8Text(utf8.encode(json.encode(obj)));
   }
 
+  /// Callback that is called when data is recieved from the server.
   void onData(dynamic obj) {
     if (!(obj is String)) {
       socket.close();
@@ -53,6 +68,7 @@ class Connection {
       socket.close();
     }
 
+    // Swtich case for each of the possible states of the game.
     switch (state) {
       case ConnectionState.waitingForHello:
         if (json['message'] != 'hello') {
@@ -129,10 +145,11 @@ class Connection {
 
     return Connection(socket, false, username, code: code);
   }
-
-
 }
 
+/// Player class.
+/// 
+/// Contains the [name] and [score] of a player
 class Player {
   String name;
   int score;
