@@ -149,7 +149,6 @@ class LobbyScreen extends StatefulWidget {
 }
 
 
-/// Interface to join a already running game.
 class LobbyScreenState extends State<LobbyScreen> {
   final TextEditingController nameController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
