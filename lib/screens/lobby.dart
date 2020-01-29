@@ -1,3 +1,4 @@
+import 'package:cap/controllers/connectionController.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -157,7 +158,9 @@ class LobbyScreenState extends State<LobbyScreen> {
 
   List<String> players = List<String>();
   String hostName;
+  String lobbyCode;
   LobbySettings settings;
+  Future<Connection> conn;
 
   @override
   void initState() {
@@ -180,6 +183,25 @@ class LobbyScreenState extends State<LobbyScreen> {
       'Martin',
       'Simonne',
     ];
+  }
+
+  LobbyScreenState() {
+    conn = widget.arguments['connection'];
+    conn.then((connection) {
+      lobbyCode = connection.code;
+      
+      connection.onJoin = (username) {
+        setState(() {
+          players.add(username);
+        });
+      };
+
+      connection.onLeft = (username) {
+        setState(() {
+          players.remove(username);
+        });
+      };
+    });
   }
 
   // 
@@ -312,7 +334,7 @@ class LobbyScreenState extends State<LobbyScreen> {
                 // Room code.
                 padding: EdgeInsets.all(5),
                 child: Text(
-                  "PEKI", //TODO: Code here
+                  "$lobbyCode", //TODO: Code here
                   style: TextStyle(
                     fontSize: 32,
                     fontFamily: 'monospace',
