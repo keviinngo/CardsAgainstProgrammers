@@ -10,7 +10,7 @@ class HomeScreen extends StatelessWidget{
           direction: Axis.vertical,
           children: <Widget>[
             Spacer(flex: 5),
-            titleCard(),
+            titleCard(context),
             Spacer(flex: 10),
             generateButton(context, 'join'),
             Spacer(flex: 5),
@@ -22,8 +22,8 @@ class HomeScreen extends StatelessWidget{
     );
   }
 
-  Widget titleCard() {
-    /// Black titlecard with the text: Cards Against Programmers \n I want to _____ a game.
+  Widget titleCard(context) {
+    /// Red titlecard with the text: Cards Against Programmers \n I want to _____ a game.
     return (
       SafeArea(
         // Will not draw out on top of notch.
@@ -37,7 +37,7 @@ class HomeScreen extends StatelessWidget{
               widthFactor: 0.9,
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.black,
+                  color: Theme.of(context).primaryColor,
                   border: Border.all(),
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                 ),

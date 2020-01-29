@@ -9,7 +9,7 @@ void main() => runApp(RootScreen());
 
 /// Main entrypoint. 
 class RootScreen extends StatelessWidget {
-  MaterialColor customColor = MaterialColor(0xFFC5133D, color);
+  final MaterialColor customColor = MaterialColor(0xffc5133d, color);
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -37,14 +37,14 @@ class RootScreen extends StatelessWidget {
 }
 
 const Map<int, Color> color = {
-  50:Color.fromRGBO(197, 19, 61, .1),
-  100:Color.fromRGBO(197, 19, 61, .2),
-  200:Color.fromRGBO(197, 19, 61, .3),
-  300:Color.fromRGBO(197, 19, 61, .4),
-  400:Color.fromRGBO(197, 19, 61, .5),
-  500:Color.fromRGBO(197, 19, 61, .6),
-  600:Color.fromRGBO(197, 19, 61, .7),
-  700:Color.fromRGBO(197, 19, 61, .8),
-  800:Color.fromRGBO(197, 19, 61, .9),
-  900:Color.fromRGBO(197, 19, 61, 1),
+  50:Color(0xffef5d7f),
+  100:Color(0xffed456c),
+  200:Color(0xffea2e5a),
+  300:Color(0xffe81748),
+  400:Color(0xffd11541),
+  500:Color(0xffc5133d),
+  600:Color(0xffba1239),
+  700:Color(0xffa21032),
+  800:Color(0xff8b0e2b),
+  900:Color(0xff740b24)
 };
