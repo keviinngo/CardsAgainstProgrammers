@@ -17,15 +17,12 @@ class SettingsDialogItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(15), 
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
+        padding: EdgeInsets.all(15),
+        child:
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           left,
           right,
-        ]
-      )
-    );
+        ]));
   }
 }
 
@@ -39,7 +36,6 @@ class LobbySettingsDialog extends StatefulWidget {
   State<LobbySettingsDialog> createState() => LobbySettingsDialogState();
 }
 
-
 class LobbySettingsDialogState extends State<LobbySettingsDialog> {
   final TextEditingController scoreToWinController = TextEditingController();
 
@@ -48,7 +44,7 @@ class LobbySettingsDialogState extends State<LobbySettingsDialog> {
 
   void initState() {
     super.initState();
-    
+
     this.settings = widget.settings;
     check = false;
   }
@@ -57,82 +53,78 @@ class LobbySettingsDialogState extends State<LobbySettingsDialog> {
   Widget build(BuildContext context) {
     scoreToWinController.text = settings.scoreToWin.toString();
     return Dialog(
-      child: Padding(
-        padding: EdgeInsets.all(10),
-        child: Container(
-          child: FractionallySizedBox(
-            heightFactor: 0.7,
-            child: Column(
-              children: [
-                Text(
-                  'Game Settings',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w600,
-                  )
-                ),
-                Divider(),
-                Expanded(
-                  flex: 2,
-                  child: ListView(
-                    shrinkWrap: true,
-                    children: [
-                      SettingsDialogItem(
-                        left: Text('Score required to win'),
-                        right: Container(
-                          width: 40,
-                          child: TextField(
-                            textAlign: TextAlign.right,
-                            controller: scoreToWinController,
-                            keyboardType: TextInputType.numberWithOptions(signed: false, decimal: false),
-                            inputFormatters: [
-                              WhitelistingTextInputFormatter(RegExp(r"[0-9]+")),
-                            ],
-                            onChanged: (val) {
-                              settings.scoreToWin = int.parse(val);
+        child: Padding(
+            padding: EdgeInsets.all(10),
+            child: Container(
+                child: FractionallySizedBox(
+                    heightFactor: 0.7,
+                    child: Column(
+                      children: [
+                        Text('Game Settings',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w600,
+                            )),
+                        Divider(),
+                        Expanded(
+                            flex: 2,
+                            child: ListView(
+                              shrinkWrap: true,
+                              children: [
+                                SettingsDialogItem(
+                                    left: Text('Score required to win'),
+                                    right: Container(
+                                        width: 40,
+                                        child: TextField(
+                                          textAlign: TextAlign.right,
+                                          controller: scoreToWinController,
+                                          keyboardType:
+                                              TextInputType.numberWithOptions(
+                                                  signed: false,
+                                                  decimal: false),
+                                          inputFormatters: [
+                                            WhitelistingTextInputFormatter(
+                                                RegExp(r"[0-9]+")),
+                                          ],
+                                          onChanged: (val) {
+                                            settings.scoreToWin =
+                                                int.parse(val);
+                                          },
+                                        ))),
+                                SettingsDialogItem(
+                                  left: Text('Pick a new host'),
+                                  right: RaisedButton(
+                                    child: Text('Pick'),
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return SimpleDialog(
+                                            children: <Widget>[Text('Hello')],
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            )),
+                        Divider(),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: RaisedButton(
+                            color: Colors.blue,
+                            textColor: Colors.white,
+                            child: Text('Save'),
+                            onPressed: () {
+                              //TODO: Have a way to cancel changes.
+                              // Probably a cancel button, plus only doing changes after 'Save'
+                              Navigator.of(context).pop();
                             },
-                          )
+                          ),
                         )
-                      ),
-                      SettingsDialogItem(
-                        left: Text('Pick a new host'),
-                        right: RaisedButton(
-                          child: Text('Pick'),
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return SimpleDialog(
-                                  children: <Widget>[Text('Hello')],
-                                );
-                              },
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  )
-                ),
-                Divider(),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: RaisedButton(
-                    color: Colors.blue,
-                    textColor: Colors.white,
-                    child: Text('Save'),
-                    onPressed: () {
-                      //TODO: Have a way to cancel changes.
-                      // Probably a cancel button, plus only doing changes after 'Save'
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                )
-              ],
-            )
-          )
-        )
-      )
-    );
+                      ],
+                    )))));
   }
 }
 
@@ -146,7 +138,6 @@ class LobbyScreen extends StatefulWidget {
   @override
   State<LobbyScreen> createState() => LobbyScreenState();
 }
-
 
 /// Interface to join a already running game.
 class LobbyScreenState extends State<LobbyScreen> {
@@ -183,7 +174,7 @@ class LobbyScreenState extends State<LobbyScreen> {
     ];
   }
 
-  // 
+  //
   Future<bool> confirmKick(BuildContext context, int index) async {
     // Show snackbar if the player kicked is yourself.
     if (players[index] == hostName) {
@@ -198,69 +189,69 @@ class LobbyScreenState extends State<LobbyScreen> {
 
     // Kick player dialog.
     return showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Kick player'),
-          content: Container( child: 
-            Text('Are you sure you want to kick this player?\n\nThey will be able to rejoin.'), 
-          ),
-          actions: [
-            FlatButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              },
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Kick player'),
+            content: Container(
+              child: Text(
+                  'Are you sure you want to kick this player?\n\nThey will be able to rejoin.'),
             ),
-            FlatButton(
-              child: Text('Kick'),
-              onPressed: () {
-                Navigator.of(context).pop(true);
-              },
-            ),
-          ],
-        );
-      }
-    );
+            actions: [
+              FlatButton(
+                child: Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                },
+              ),
+              FlatButton(
+                child: Text('Kick'),
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                },
+              ),
+            ],
+          );
+        });
   }
 
   // Individual item in the [buildPlayerList] [ListView]
   Widget buildItem(BuildContext context, int index) {
     // Swipable tile for each player.
     return Dismissible(
-      key: GlobalKey(),
-      resizeDuration: Duration(milliseconds: 200),
-
-      background: Container(
-        color: Colors.red,
-        padding: EdgeInsets.only(left: 20),
-        alignment: Alignment.centerLeft,
-        child: Icon(Icons.gavel),
-      ),
-      onDismissed: (DismissDirection direction) {
-        setState((){
-          players.remove(players[index]);
-        });
-      },
-      confirmDismiss: (direction) async => confirmKick(context,index),
-      child: Column(
-        children: [
+        key: GlobalKey(),
+        resizeDuration: Duration(milliseconds: 200),
+        background: Container(
+          color: Colors.red,
+          padding: EdgeInsets.only(left: 20),
+          alignment: Alignment.centerLeft,
+          child: Icon(Icons.gavel),
+        ),
+        onDismissed: (DismissDirection direction) {
+          setState(() {
+            players.remove(players[index]);
+          });
+        },
+        confirmDismiss: (direction) async => confirmKick(context, index),
+        child: Column(children: [
           Container(
-            child: ListTile(
-              title: Text(
-                players[index],
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 20,
-                ),
+              child: ListTile(
+            title: Text(
+              players[index],
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 20,
               ),
-              subtitle: players[index] != hostName ? Text('Swipe to kick', style: TextStyle(fontSize: 10),) : null,
-            )
-          ),
+            ),
+            subtitle: players[index] != hostName
+                ? Text(
+                    'Swipe to kick',
+                    style: TextStyle(fontSize: 10),
+                  )
+                : null,
+          )),
           Divider(),
-        ]
-      )
-    );
+        ]));
   }
 
   // [ListView] of players in the lobby.
@@ -271,7 +262,8 @@ class LobbyScreenState extends State<LobbyScreen> {
           topLeft: Radius.circular(2),
           topRight: Radius.circular(2),
         ),
-        border: Border.fromBorderSide(BorderSide(color: Theme.of(context).dividerColor)),
+        border: Border.fromBorderSide(
+            BorderSide(color: Theme.of(context).dividerColor)),
       ),
       child: ListView.builder(
         shrinkWrap: false,
@@ -303,52 +295,53 @@ class LobbyScreenState extends State<LobbyScreen> {
         ],
       ),
       body: Center(
-        child: Container(
-          constraints: BoxConstraints(
-            maxWidth: 400,
-          ),
-          child: Column(
-            children: <Widget>[
-              Padding(
-                // Room code.
-                padding: EdgeInsets.all(5),
-                child: Text(
-                  "PEKI", //TODO: Code here
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontFamily: 'monospace',
+          child: Container(
+              constraints: BoxConstraints(
+                maxWidth: 400,
+              ),
+              child: Column(children: <Widget>[
+                Padding(
+                  // Room code.
+                  padding: EdgeInsets.all(5),
+                  child: Text(
+                    "PEKI", //TODO: Code here
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontFamily: 'monospace',
+                    ),
                   ),
                 ),
-              ),
-              Divider(color: Colors.black,),
-              // Playercount and start button.
-              Padding(
-                padding: EdgeInsets.all(5),
-                child: Row(
-                  children: [
-                    Text(
-                      'Players (${players.length}/$maxPlayers)',
-                      style:  TextStyle(
-                        fontSize: 24,
-                      ),
-                    ),
-                    //TODO: Probably better with a grid layout or something!
-                    Container(height: 40, child: VerticalDivider(color: Colors.black,)),
-                    RaisedButton(
-                      child: Text('Start Game'),
-                      onPressed: () {
-                        print('GOGOGOG');
-                      },
-                    ),
-                  ],
-                )
-              ),
-              // Listview of current players in the lobby.
-              Expanded(child: buildPlayerList()),
-            ]
-          )
-        )
-      ),
+                Divider(
+                  color: Colors.black,
+                ),
+                // Playercount and start button.
+                Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Row(
+                      children: [
+                        Text(
+                          'Players (${players.length}/$maxPlayers)',
+                          style: TextStyle(
+                            fontSize: 24,
+                          ),
+                        ),
+                        //TODO: Probably better with a grid layout or something!
+                        Container(
+                            height: 40,
+                            child: VerticalDivider(
+                              color: Colors.black,
+                            )),
+                        RaisedButton(
+                          child: Text('Start Game'),
+                          onPressed: () {
+                            print('GOGOGOG');
+                          },
+                        ),
+                      ],
+                    )),
+                // Listview of current players in the lobby.
+                Expanded(child: buildPlayerList()),
+              ]))),
     );
   }
 }
