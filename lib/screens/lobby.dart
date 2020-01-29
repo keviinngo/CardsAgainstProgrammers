@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-
+/// Lobby settings.
 class LobbySettings {
   int scoreToWin = 5;
   bool check = false;
 }
 
-
+/// Dialog item for [LobbySettingsDialog].
 class SettingsDialogItem extends StatelessWidget {
   final Widget left;
   final Widget right;
@@ -29,7 +29,7 @@ class SettingsDialogItem extends StatelessWidget {
   }
 }
 
-
+/// Dialog for editing lobby settings.
 class LobbySettingsDialog extends StatefulWidget {
   final LobbySettings settings;
 
@@ -136,7 +136,6 @@ class LobbySettingsDialogState extends State<LobbySettingsDialog> {
   }
 }
 
-
 class LobbyScreen extends StatefulWidget {
   final Map<String, dynamic> arguments;
 
@@ -184,7 +183,9 @@ class LobbyScreenState extends State<LobbyScreen> {
     ];
   }
 
+  // 
   Future<bool> confirmKick(BuildContext context, int index) async {
+    // Show snackbar if the player kicked is yourself.
     if (players[index] == hostName) {
       Scaffold.of(context).showSnackBar(SnackBar(
         content: Text('You cannot kick yourself.'),
@@ -195,6 +196,7 @@ class LobbyScreenState extends State<LobbyScreen> {
       return false;
     }
 
+    // Kick player dialog.
     return showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
@@ -222,7 +224,9 @@ class LobbyScreenState extends State<LobbyScreen> {
     );
   }
 
+  // Individual item in the [buildPlayerList] [ListView]
   Widget buildItem(BuildContext context, int index) {
+    // Swipable tile for each player.
     return Dismissible(
       key: GlobalKey(),
       resizeDuration: Duration(milliseconds: 200),
@@ -259,6 +263,7 @@ class LobbyScreenState extends State<LobbyScreen> {
     );
   }
 
+  // [ListView] of players in the lobby.
   Widget buildPlayerList() {
     return Container(
       decoration: BoxDecoration(
@@ -283,6 +288,7 @@ class LobbyScreenState extends State<LobbyScreen> {
       appBar: AppBar(
         title: Text('Lobby'),
         actions: <Widget>[
+          // Button to open the settings dialog.
           IconButton(
             icon: Icon(Icons.settings),
             onPressed: () {
@@ -302,8 +308,9 @@ class LobbyScreenState extends State<LobbyScreen> {
             maxWidth: 400,
           ),
           child: Column(
-            children: [
+            children: <Widget>[
               Padding(
+                // Room code.
                 padding: EdgeInsets.all(5),
                 child: Text(
                   "PEKI", //TODO: Code here
@@ -314,6 +321,7 @@ class LobbyScreenState extends State<LobbyScreen> {
                 ),
               ),
               Divider(color: Colors.black,),
+              // Playercount and start button.
               Padding(
                 padding: EdgeInsets.all(5),
                 child: Row(
@@ -335,6 +343,7 @@ class LobbyScreenState extends State<LobbyScreen> {
                   ],
                 )
               ),
+              // Listview of current players in the lobby.
               Expanded(child: buildPlayerList()),
             ]
           )
