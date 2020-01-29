@@ -25,7 +25,7 @@ class JoinScreen extends StatelessWidget {
       maxLengthEnforced: true,
       textAlign: TextAlign.center,
       decoration: InputDecoration(
-        hintText: 'Code',
+        hintText: '0000',
         border: OutlineInputBorder(),
       ),
       inputFormatters: [
@@ -36,7 +36,7 @@ class JoinScreen extends StatelessWidget {
       textCapitalization: TextCapitalization.characters,
       keyboardType: TextInputType.text,
       validator: (str) {
-        return str.length != 4 ? "Code too short" : null;
+        return str.length != 4 ? "Room code too short" : null;
       },
     );
   }
@@ -44,11 +44,11 @@ class JoinScreen extends StatelessWidget {
   Widget buildNameField() {
     return TextFormField(
       controller: nameController,
-      maxLength: 64,
+      maxLength: 20,
       maxLengthEnforced: true,
       textAlign: TextAlign.center,
       decoration: InputDecoration(
-        hintText: 'Name',
+        hintText: '----',
         border: OutlineInputBorder(),
       ),
       inputFormatters: [],
@@ -101,8 +101,12 @@ class JoinScreen extends StatelessWidget {
             child: Column(
               children: [
                 Padding(padding: EdgeInsets.only(top: 40),),
+                Text('ROOM CODE', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                Padding(padding: EdgeInsets.only(top: 10),),
                 buildCodeField(),
                 Padding(padding: EdgeInsets.only(top: 20),),
+                Text('ENTER YOUR NAME', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                Padding(padding: EdgeInsets.only(top: 10),),
                 buildNameField(),
                 joinButton(context)
               ]
