@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+
 /// Interface to join a already running game.
 class CreateScreen extends StatelessWidget {
   final TextEditingController nameController = TextEditingController();
@@ -30,31 +31,35 @@ class CreateScreen extends StatelessWidget {
         title: Text('Create'),
       ),
       body: Center(
-          child: Container(
-              constraints: BoxConstraints(
-                maxWidth: 400,
-              ),
-              child: Form(
-                key: formKey,
-                child: Column(children: [
-                  Padding(
-                    padding: EdgeInsets.only(top: 20),
-                  ),
-                  buildNameField(),
-                  RaisedButton(
-                    child: Text('Create'),
-                    onPressed: () {
-                      if (formKey.currentState.validate()) {
-                        print("Create game as ${nameController.text}");
-                        Navigator.of(context)
-                            .pushReplacementNamed('/lobby', arguments: {
+        child: Container(
+          constraints: BoxConstraints(
+            maxWidth: 400,
+          ),
+          child: Form(
+            key: formKey,
+            child: Column(
+              children: [
+                Padding(padding: EdgeInsets.only(top: 20),),
+                buildNameField(),
+                RaisedButton(
+                  child: Text('Create'),
+                  onPressed: () {
+                    if (formKey.currentState.validate()) {
+                      print("Create game as ${nameController.text}");
+                      Navigator.of(context).pushReplacementNamed(
+                        '/lobby',
+                        arguments: {
                           'username': nameController.text,
-                        });
-                      }
-                    },
-                  ),
-                ]),
-              ))),
+                        }
+                      );
+                    }
+                  },
+                ),
+              ]
+            ),
+          )
+        )
+      ),
     );
   }
 }

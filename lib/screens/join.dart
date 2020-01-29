@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+
 /// TextInputFormatter that makes sure all letters are capitalized.
 class UppercaseInputFormatter extends TextInputFormatter {
   @override
-  TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
     // Should we or should we not set `composing` on the returned value
-    return TextEditingValue(
-        text: newValue.text.toUpperCase(), selection: newValue.selection);
+    return TextEditingValue(text: newValue.text.toUpperCase(), selection: newValue.selection);
   }
 }
+
 
 /// Interface to join a already running game.
 class JoinScreen extends StatelessWidget {
@@ -66,32 +66,31 @@ class JoinScreen extends StatelessWidget {
         title: Text('Join'),
       ),
       body: Center(
-          child: Container(
-              constraints: BoxConstraints(
-                maxWidth: 400,
-              ),
-              child: Form(
-                key: formKey,
-                child: Column(children: [
-                  Padding(
-                    padding: EdgeInsets.only(top: 40),
-                  ),
-                  buildCodeField(),
-                  Padding(
-                    padding: EdgeInsets.only(top: 20),
-                  ),
-                  buildNameField(),
-                  RaisedButton(
-                    child: Text('Join'),
-                    onPressed: () {
-                      if (formKey.currentState.validate()) {
-                        print(
-                            "Join ${codeController.text} as ${nameController.text}");
-                      }
-                    },
-                  ),
-                ]),
-              ))),
+        child: Container(
+          constraints: BoxConstraints(
+            maxWidth: 400,
+          ),
+          child: Form(
+            key: formKey,
+            child: Column(
+              children: [
+                Padding(padding: EdgeInsets.only(top: 40),),
+                buildCodeField(),
+                Padding(padding: EdgeInsets.only(top: 20),),
+                buildNameField(),
+                RaisedButton(
+                  child: Text('Join'),
+                  onPressed: () {
+                    if (formKey.currentState.validate()) {
+                      print("Join ${codeController.text} as ${nameController.text}");
+                    }
+                  },
+                ),
+              ]
+            ),
+          )
+        )
+      ),
     );
   }
 }
