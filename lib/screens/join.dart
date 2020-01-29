@@ -59,6 +59,32 @@ class JoinScreen extends StatelessWidget {
     );
   }
 
+  Widget joinButton(context) {
+    return InkWell(
+      borderRadius: BorderRadius.all(Radius.circular(10)),
+      onTap: (() {
+        if (formKey.currentState.validate()) {
+          print("Join ${codeController.text} as ${nameController.text}");
+        }
+      }),
+      child: Ink(
+        width: 160,
+        height: 90,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: Colors.black, style: BorderStyle.solid, width: 0.5),
+          borderRadius: BorderRadius.all(Radius.circular(10))
+        ),
+        child: Center(
+          child: Text(
+            'Join',
+            textAlign: TextAlign.center,
+          ),
+        )
+      )
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,14 +104,7 @@ class JoinScreen extends StatelessWidget {
                 buildCodeField(),
                 Padding(padding: EdgeInsets.only(top: 20),),
                 buildNameField(),
-                RaisedButton(
-                  child: Text('Join'),
-                  onPressed: () {
-                    if (formKey.currentState.validate()) {
-                      print("Join ${codeController.text} as ${nameController.text}");
-                    }
-                  },
-                ),
+                joinButton(context)
               ]
             ),
           )

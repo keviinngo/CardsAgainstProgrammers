@@ -12,9 +12,9 @@ class HomeScreen extends StatelessWidget{
             Spacer(flex: 5),
             titleCard(),
             Spacer(flex: 10),
-            joinButton(context),
+            generateButton(context, 'join'),
             Spacer(flex: 5),
-            createButton(context),
+            generateButton(context, 'create'),
             Spacer(flex: 50)
           ],
         )
@@ -55,37 +55,13 @@ class HomeScreen extends StatelessWidget{
     );
   }
 
-  // TODO: Aspecratio
-  Widget joinButton(context) {
-    return InkWell(
-      borderRadius: BorderRadius.all(Radius.circular(10)),
-      onTap: (() {
-        Navigator.pushNamed(context, '/join');
-      }),
-      child: Ink(
-        width: 160,
-        height: 90,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: Colors.black, style: BorderStyle.solid, width: 0.5),
-          borderRadius: BorderRadius.all(Radius.circular(10))
-        ),
-        child: Center(
-          child: Text(
-            'Join',
-            textAlign: TextAlign.center,
-          ),
-        )
-      )
-    );
-  }
-
   // TODO: Aspect ratio
-  Widget createButton(context) {
+  // Creates a button with the text `text`
+  Widget generateButton(context, String text) {
     return InkWell(
       borderRadius: BorderRadius.all(Radius.circular(10)),
       onTap: (() {
-        Navigator.pushNamed(context, '/create');
+        Navigator.pushNamed(context, '/$text');
       }),
       child: Ink(
         width: 160,
@@ -97,7 +73,7 @@ class HomeScreen extends StatelessWidget{
         ),
         child: Center(
           child: Text(
-            'Create',
+            '$text',
             textAlign: TextAlign.center,
           ),
         )
