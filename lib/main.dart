@@ -9,6 +9,7 @@ void main() => runApp(RootScreen());
 
 /// Main entrypoint. 
 class RootScreen extends StatelessWidget {
+  MaterialColor customColor = MaterialColor(0xFFC5133D, color);
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -25,7 +26,7 @@ class RootScreen extends StatelessWidget {
         '/lobby': (context) => LobbyScreen(arguments: ModalRoute.of(context).settings.arguments as Map<String, dynamic>),
       },
       theme: ThemeData(
-        primaryColor: Colors.black,
+        primarySwatch: customColor
       )
       /*ThemeData(
         backgroundColor: Colors.white
@@ -34,3 +35,16 @@ class RootScreen extends StatelessWidget {
     );
   }
 }
+
+const Map<int, Color> color = {
+  50:Color.fromRGBO(197, 19, 61, .1),
+  100:Color.fromRGBO(197, 19, 61, .2),
+  200:Color.fromRGBO(197, 19, 61, .3),
+  300:Color.fromRGBO(197, 19, 61, .4),
+  400:Color.fromRGBO(197, 19, 61, .5),
+  500:Color.fromRGBO(197, 19, 61, .6),
+  600:Color.fromRGBO(197, 19, 61, .7),
+  700:Color.fromRGBO(197, 19, 61, .8),
+  800:Color.fromRGBO(197, 19, 61, .9),
+  900:Color.fromRGBO(197, 19, 61, 1),
+};
