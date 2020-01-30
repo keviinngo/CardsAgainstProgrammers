@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 
@@ -24,6 +25,8 @@ class Connection {
   String code;
   bool isHost;
   bool inLobby;
+  bool isValidCode;
+  Completer<bool> codeIsValidFuture;
 
   /// The callback that is called when a player joins the game.
   void Function(String) onJoin;
@@ -39,7 +42,7 @@ class Connection {
   /// Takes in arguments [socket], [isHost] and [username].
   ///
   /// named argument [code]
-  Connection(this.socket, this.isHost, this.username, {this.code}) {
+  Connection(this.socket, this.isHost, this.username, {this.code, this.isValidCode}) {
     socket.listen(onData);
   }
 
@@ -52,6 +55,7 @@ class Connection {
   void onData(dynamic obj) {
     if (!(obj is String)) {
       socket.close();
+      return;
     }
 
     String msg = obj as String;
@@ -62,10 +66,17 @@ class Connection {
     } catch(e) {
       sendJson({'message': 'invalid_json'});
       socket.close();
+      return;
     }
 
     if (json['message'] == 'bye') {
       socket.close();
+      return;
+    }
+
+    if (json['message'] == 'code_checked') {
+      codeIsValidFuture.complete(json['is_valid']);
+      return;
     }
 
     // Swtich case for each of the possible states of the game.
@@ -86,6 +97,7 @@ class Connection {
       case ConnectionState.joiningGame:
         // TODO: Handle this case.
         if (json['message'] != 'joined_game') {
+          code = null;
           return;
         }
 
@@ -130,6 +142,13 @@ class Connection {
         // TODO: Handle this case.
         break;
     }
+  }
+
+  Future<bool> codeIsValid(String code) async {
+    sendJson({'message': 'code_is_valid', 'code': code});
+    codeIsValidFuture = Completer<bool>();
+
+    return codeIsValidFuture.future;
   }
 
   static Future<Connection> createGame(String username) async {
