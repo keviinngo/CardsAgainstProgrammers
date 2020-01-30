@@ -26,7 +26,7 @@ class Connection {
   bool isHost;
   bool inLobby;
   bool isValidCode;
-  Completer<bool> codeIsValidFuture;
+  Completer<bool> codeIsValidFuture = Completer<bool>();
 
   /// The callback that is called when a player joins the game.
   void Function(String) onJoin;
@@ -101,13 +101,15 @@ class Connection {
       case ConnectionState.joiningGame:
         // TODO: Handle this case.
         if (json['message'] == 'invalid_lobby_code') {
-          code = null;
+          codeIsValidFuture.complete(false);
           return;
         }
 
         if (json['message'] != 'joined_game') {
           return;
         }
+
+        codeIsValidFuture.complete(true);
 
         // json['users']
         if (onJoinedGame != null) {
@@ -156,12 +158,13 @@ class Connection {
     }
   }
 
-  Future<bool> codeIsValid(String code) async {
+  // check for code
+  /*Future<bool> codeIsValid(String code) async {
     sendJson({'message': 'code_is_valid', 'code': code});
     codeIsValidFuture = Completer<bool>();
 
     return codeIsValidFuture.future;
-  }
+  }*/
 
   static Future<Connection> createGame(String username) async {
     var socket = await WebSocket.connect("ws://$SERVER_ADDRESS:$SERVER_PORT$SERVER_PATH");

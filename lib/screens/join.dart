@@ -66,18 +66,15 @@ class JoinScreen extends StatelessWidget {
       onTap: (() {
         if (formKey.currentState.validate()) {
           Future<Connection> conn = Connection.joinGame('${nameController.text}', '${codeController.text}');
-          conn.then((connection) {
-            connection.codeIsValid(codeController.text).then((isValid) {
-              if (isValid) {
-                Navigator.of(context).pushReplacementNamed('/lobby', arguments: {
+          conn.then((connection) async {
+            if (await connection.codeIsValidFuture.future) {
+              Navigator.of(context).pushReplacementNamed('/lobby', arguments: {
                   'connection': conn,
                   'username': nameController.text
-                });
-              } else {
-                connection.socket.close();
-                print('nah bro');
-              }
-            });
+              });
+            } else {
+              print('nah bro');
+            }
           });
         }
       }),
