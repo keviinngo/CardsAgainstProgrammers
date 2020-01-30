@@ -71,6 +71,8 @@ class Connection {
       return;
     }
 
+    print("${this.username}: ${json.toString()}");
+
     if (json['message'] == 'bye') {
       socket.close();
       return;
@@ -98,8 +100,12 @@ class Connection {
         break;
       case ConnectionState.joiningGame:
         // TODO: Handle this case.
-        if (json['message'] != 'joined_game') {
+        if (json['message'] == 'invalid_lobby_code') {
           code = null;
+          return;
+        }
+
+        if (json['message'] != 'joined_game') {
           return;
         }
 
