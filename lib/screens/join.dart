@@ -26,10 +26,10 @@ class JoinScreen extends StatelessWidget {
       textAlign: TextAlign.center,
       decoration: InputDecoration(
         hintText: '0000',
-        border: OutlineInputBorder(),
+        border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
       ),
       inputFormatters: [
-        WhitelistingTextInputFormatter(RegExp(r"[A-Za-z]*")),
+        WhitelistingTextInputFormatter(RegExp(r"[0-9]*")),
         UppercaseInputFormatter(),
       ],
       enableSuggestions: false,
@@ -49,9 +49,11 @@ class JoinScreen extends StatelessWidget {
       textAlign: TextAlign.center,
       decoration: InputDecoration(
         hintText: '----',
-        border: OutlineInputBorder(),
+        border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
       ),
-      inputFormatters: [],
+      inputFormatters: [
+        WhitelistingTextInputFormatter(RegExp(r"[A-Za-z]*")),
+      ],
       enableSuggestions: true,
       validator: (str) {
         return str.isEmpty ? "Need a name" : null;
@@ -79,6 +81,7 @@ class JoinScreen extends StatelessWidget {
           child: Text(
             'Join',
             textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
         )
       )
