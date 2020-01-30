@@ -25,11 +25,11 @@ class JoinScreen extends StatelessWidget {
       maxLengthEnforced: true,
       textAlign: TextAlign.center,
       decoration: InputDecoration(
-        hintText: '0000',
+        hintText: '----',
         border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
       ),
       inputFormatters: [
-        WhitelistingTextInputFormatter(RegExp(r"[0-9]*")),
+        WhitelistingTextInputFormatter(RegExp(r"[A-Za-z]*")),
         UppercaseInputFormatter(),
       ],
       enableSuggestions: false,
