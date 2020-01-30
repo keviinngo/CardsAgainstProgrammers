@@ -159,6 +159,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
   List<String> players = List<String>();
   String hostName;
   String lobbyCode;
+  bool isHost;
   LobbySettings settings;
   Future<Connection> conn;
 
@@ -170,6 +171,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
     hostName = widget.arguments['username'];
     conn = widget.arguments['connection'];
     conn.then((connection) {
+      isHost = connection.isHost;
       connection.onJoin = (username) {
         setState(() {
           players.add(username);
@@ -192,6 +194,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
       connection.onJoinedGame = (userList) {
         setState(() {
           players = userList;
+          lobbyCode = connection.code;
         });
       };
     });
@@ -278,6 +281,25 @@ class _LobbyScreenState extends State<LobbyScreen> {
     );
   }
 
+  Widget playerListItem(index) {
+    return Column(
+        children: [
+          Container(
+            child: ListTile(
+              title: Text(
+                players[index],
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 20,
+                ),
+              ),
+            )
+          ),
+          Divider(),
+        ]
+    );
+  }
+
   // [ListView] of players in the lobby.
   Widget buildPlayerList() {
     return Container(
@@ -292,7 +314,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
         shrinkWrap: false,
         scrollDirection: Axis.vertical,
         itemCount: players.length,
-        itemBuilder: (context, index) => buildItem(context, index),
+        itemBuilder: (context, index) => isHost ? buildItem(context, index) : playerListItem(index),
       ),
     );
   }
