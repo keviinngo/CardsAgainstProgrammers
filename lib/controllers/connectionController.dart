@@ -37,6 +37,8 @@ class Connection {
   /// The callback that is called when you join a game.
   void Function(List<String>) onJoinedGame;
 
+  void Function() onKicked;
+
   /// Connection constructor.
   /// 
   /// Takes in arguments [socket], [isHost] and [username].
@@ -136,6 +138,10 @@ class Connection {
         // Left
         if (json['message'] == 'left' && onLeft != null) {
           onLeft(json['user']);
+        }
+
+        if (json['message'] == 'kicked' && onKicked != null) {
+          onKicked();
         }
 
         // 

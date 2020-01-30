@@ -184,6 +184,23 @@ class _LobbyScreenState extends State<LobbyScreen> {
         });
       };
 
+      connection.onKicked = (){
+        setState(() {
+          showDialog(context: context, builder: (context){
+            return AlertDialog(
+              title: Text('Kicked'),
+              actions: <Widget>[
+                RaisedButton(
+                  onPressed: () {
+                    Navigator.of(context).pushReplacementNamed('/');
+                  },
+                )
+              ],
+            );
+          });
+        });
+      };
+
       connection.onGameCreated = () {
         setState(() {
           players = [hostName];
