@@ -327,7 +327,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
     );
   }
 
-  // [ListView] of players in the lobby.
+  /// [ListView] of players in the lobby.
+  //TODO: Show an indication for users themselves
   Widget buildPlayerList() {
     return ClipRect(child: Container(
       decoration: BoxDecoration(
