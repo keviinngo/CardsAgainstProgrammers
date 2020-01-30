@@ -1,5 +1,6 @@
 import 'package:cap/screens/join.dart';
 import 'package:cap/screens/lobby.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cap/screens/home.dart';
 import 'package:cap/screens/create.dart';
@@ -16,14 +17,29 @@ class RootScreen extends StatelessWidget {
     return MaterialApp(
       title: 'Cards Against Programmers',
       initialRoute: '/',
-      routes: {
-        // When navigating to the "/" route, build the HomePage widget.
-        // 
-        // List of all routes in the application.
-        '/': (context) => HomeScreen(),
-        '/join': (context) => JoinScreen(),
-        '/create': (context) => CreateScreen(),
-        '/lobby': (context) => LobbyScreen(arguments: ModalRoute.of(context).settings.arguments as Map<String, dynamic>),
+      onGenerateRoute: (RouteSettings settings) {
+        switch(settings.name) {
+        case '/ ':
+          return CupertinoPageRoute(builder: (_) {
+            return HomeScreen();
+          });
+          break;
+        case '/join':
+          return CupertinoPageRoute(builder: (_) {
+            return JoinScreen();
+          });
+          break;
+        case '/create':
+          return CupertinoPageRoute(builder: (_) {
+            return CreateScreen();
+          });
+          break;
+        case '/lobby':
+          return CupertinoPageRoute(builder: (_) {
+            return LobbyScreen(arguments: settings.arguments as Map<String, dynamic>);
+          });
+          break;
+        }
       },
       theme: ThemeData(
         primarySwatch: customColor,
