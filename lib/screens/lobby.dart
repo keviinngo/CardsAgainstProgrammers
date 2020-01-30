@@ -164,6 +164,16 @@ class _LobbyScreenState extends State<LobbyScreen> {
   Future<Connection> conn;
 
   @override
+  void dispose() {
+    super.dispose();
+
+    conn.then((connection) {
+      connection.sendJson({'message': 'leave_game'});
+      connection.socket.close();
+    });
+  }
+
+  @override
   void initState() {
     super.initState();
     settings = LobbySettings();
