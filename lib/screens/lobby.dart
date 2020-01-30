@@ -145,11 +145,11 @@ class LobbyScreen extends StatefulWidget {
   });
 
   @override
-  State<LobbyScreen> createState() => LobbyScreenState();
+  State<LobbyScreen> createState() => _LobbyScreenState();
 }
 
 
-class LobbyScreenState extends State<LobbyScreen> {
+class _LobbyScreenState extends State<LobbyScreen> {
   final TextEditingController nameController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final GlobalKey kickYourselfSnackbarKey = GlobalKey();
@@ -168,28 +168,8 @@ class LobbyScreenState extends State<LobbyScreen> {
     settings = LobbySettings();
 
     hostName = widget.arguments['username'];
-    players = [
-      widget.arguments['username'],
-      'Tosha',
-      'Von',
-      'Renee',
-      'Chet',
-      'Stephany',
-      'Lolita',
-      'Roseanne',
-      'Delphia',
-      'Jacquline',
-      'Un',
-      'Martin',
-      'Simonne',
-    ];
-  }
-
-  LobbyScreenState() {
     conn = widget.arguments['connection'];
     conn.then((connection) {
-      lobbyCode = connection.code;
-      
       connection.onJoin = (username) {
         setState(() {
           players.add(username);
@@ -199,6 +179,19 @@ class LobbyScreenState extends State<LobbyScreen> {
       connection.onLeft = (username) {
         setState(() {
           players.remove(username);
+        });
+      };
+
+      connection.onGameCreated = () {
+        setState(() {
+          players = [hostName];
+          lobbyCode = connection.code;
+        });
+      };
+
+      connection.onJoinedGame = (userList) {
+        setState(() {
+          players = userList;
         });
       };
     });
@@ -248,6 +241,7 @@ class LobbyScreenState extends State<LobbyScreen> {
   // Individual item in the [buildPlayerList] [ListView]
   Widget buildItem(BuildContext context, int index) {
     // Swipable tile for each player.
+    // TODO: not have dismissable for joining users.
     return Dismissible(
       key: GlobalKey(),
       resizeDuration: Duration(milliseconds: 200),

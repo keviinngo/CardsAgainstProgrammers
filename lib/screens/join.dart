@@ -65,11 +65,12 @@ class JoinScreen extends StatelessWidget {
       borderRadius: BorderRadius.all(Radius.circular(10)),
       onTap: (() {
         if (formKey.currentState.validate()) {
-          Future<Connection> conn = Connection.joinGame('${codeController.text}}', '${nameController.text}');
+          Future<Connection> conn = Connection.joinGame('${nameController.text}}', '${codeController.text}');
           Navigator.of(context).pushReplacementNamed(
             '/lobby',
             arguments: {
-              'connection': conn
+              'connection': conn,
+              'username': nameController.text
             }
           );
         }

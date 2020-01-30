@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 
-const String SERVER_ADDRESS = "10.97.60.255";
+const String SERVER_ADDRESS = "10.97.60.108";
 const String SERVER_PATH = "/game";
 const int SERVER_PORT = 8080;
 
