@@ -16,10 +16,10 @@ class RootScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Cards Against Programmers',
-      initialRoute: '/',
+      //initialRoute: '/',
       onGenerateRoute: (RouteSettings settings) {
         switch(settings.name) {
-        case '/ ':
+        case '/':
           return CupertinoPageRoute(builder: (_) {
             return HomeScreen();
           });
@@ -35,7 +35,7 @@ class RootScreen extends StatelessWidget {
           });
           break;
         case '/lobby':
-          return CupertinoPageRoute(builder: (_) {
+          return MaterialPageRoute(builder: (_) {
             return LobbyScreen(arguments: settings.arguments as Map<String, dynamic>);
           });
           break;
