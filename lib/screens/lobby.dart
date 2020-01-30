@@ -302,7 +302,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
 
   // [ListView] of players in the lobby.
   Widget buildPlayerList() {
-    return Container(
+    return ClipRect(child: Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(2),
@@ -316,7 +316,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
         itemCount: players.length,
         itemBuilder: (context, index) => isHost ? buildItem(context, index) : playerListItem(index),
       ),
-    );
+    ));
   }
 
   @override
