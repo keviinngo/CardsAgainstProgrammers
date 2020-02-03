@@ -179,6 +179,31 @@ class Connection {
 
     return Connection(socket, false, username, code: code);
   }
+
+  static Future<Connection> checkCodeAndJoinGame(String username, String code) async {
+    var socket = await WebSocket.connect("ws://$SERVER_ADDRESS:$SERVER_PORT$SERVER_PATH");
+
+    var completer = Completer<Connection>();
+
+    socket.addUtf8Text(utf8.encode('{"message":"code_is_valid","code":"$code"}'));
+    socket.listen((data) async {
+      var json = jsonDecode(utf8.decode(data));
+      print(json);
+
+      if (json['message'] == 'code_checked') {
+        if (json['is_valid']) {
+          completer.complete(joinGame(username, code));
+        } else {
+          completer.complete(null);
+        }
+        socket.close();
+      }
+    }, onDone: () {
+      print('checkAndJoinGame: check code session failed');
+    });
+
+    return completer.future;
+  }
 }
 
 /// Player class.

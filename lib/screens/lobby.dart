@@ -182,6 +182,29 @@ class _LobbyScreenState extends State<LobbyScreen> {
     conn = widget.arguments['connection'];
     conn.then((connection) {
       isHost = connection.isHost;
+
+      // connection.codeIsValidFuture.future.then((val) {
+      //   if(!val) {
+      //     Navigator.of(context).pushReplacementNamed('/join');
+      //     showDialog(
+      //       context: context,
+      //       builder: (context) {
+      //         return AlertDialog(
+      //           content: Text('Invalid game code.'),
+      //           actions: <Widget>[
+      //             FlatButton(
+      //               child: Text('Ok'),
+      //               onPressed: () {
+      //                 Navigator.of(context).pop();
+      //               },
+      //             )
+      //           ],
+      //         );
+      //       }
+      //     );
+      //   }
+      // });
+
       connection.onJoin = (username) {
         setState(() {
           players.add(username);
@@ -219,6 +242,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
       };
 
       connection.onJoinedGame = (userList) {
+        print('joined game');
         setState(() {
           players = userList;
           lobbyCode = connection.code;
