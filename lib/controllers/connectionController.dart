@@ -185,9 +185,8 @@ class Connection {
 
     var completer = Completer<Connection>();
 
-    socket.addUtf8Text(utf8.encode('{"message":"code_is_valid","code":"$code"}'));
     socket.listen((data) async {
-      var json = jsonDecode(utf8.decode(data));
+      var json = jsonDecode(data);
       print(json);
 
       if (json['message'] == 'code_checked') {
@@ -201,6 +200,7 @@ class Connection {
     }, onDone: () {
       print('checkAndJoinGame: check code session failed');
     });
+    socket.addUtf8Text(utf8.encode('{"message":"code_is_valid","code":"$code"}'));
 
     return completer.future;
   }
