@@ -140,12 +140,12 @@ class Connection {
 
         // Joined
         if (json['message'] == 'joined' && onJoin != null) {
-          onJoin(json['user']);
+          onJoin(json['username']);
         }
 
         // Left
         if (json['message'] == 'left' && onLeft != null) {
-          onLeft(json['user']);
+          onLeft(json['username']);
         }
 
         if (json['message'] == 'kicked' && onKicked != null) {
