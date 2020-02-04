@@ -308,7 +308,9 @@ class _LobbyScreenState extends State<LobbyScreen> {
       ),
       onDismissed: (DismissDirection direction) {
         setState((){
-          players.remove(players[index]);
+          conn.then((connection){
+            connection.kickPlayer(players[index]);
+          });
         });
       },
       confirmDismiss: (direction) async => confirmKick(context,index),

@@ -151,6 +151,9 @@ class Connection {
     }
   }
 
+  void kickPlayer (String username) {
+    sendJson({"message": "kick_player", "username": username});
+  }
 
   static Future<Connection> createGame(String username) async {
     var socket = await WebSocket.connect("ws://$SERVER_ADDRESS:$SERVER_PORT$SERVER_PATH");
