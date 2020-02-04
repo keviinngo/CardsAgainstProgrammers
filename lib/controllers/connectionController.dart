@@ -152,7 +152,7 @@ class Connection {
     }
   }
 
-  // function to kick specific username
+  /// function to kick specific username
   void kickPlayer (String username) {
     sendJson({"message": "kick_player", "username": username});
   }
