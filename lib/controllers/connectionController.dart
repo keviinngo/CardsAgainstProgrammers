@@ -35,7 +35,7 @@ class Connection {
   void Function() onGameCreated;
   /// The callback that is called when you join a game.
   void Function(List<String>) onJoinedGame;
-
+  /// The callback is called when a player is kicked.
   void Function() onKicked;
 
   /// Connection constructor.
@@ -141,6 +141,7 @@ class Connection {
           onLeft(json['username']);
         }
 
+        //Kicked
         if (json['message'] == 'kicked' && onKicked != null) {
           onKicked();
         }
@@ -151,6 +152,7 @@ class Connection {
     }
   }
 
+  // function to kick specific username
   void kickPlayer (String username) {
     sendJson({"message": "kick_player", "username": username});
   }
