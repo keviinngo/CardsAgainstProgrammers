@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:simple_animations/simple_animations.dart';
 
 class HomeScreen extends StatelessWidget{
   // The Homepagescreen. The first screen after opening up the app.
@@ -10,11 +11,11 @@ class HomeScreen extends StatelessWidget{
           direction: Axis.vertical,
           children: <Widget>[
             Spacer(flex: 5),
-            titleCard(context),
+            FadeIn(2.0, titleCard(context)),
             Spacer(flex: 10),
-            generateButton(context, 'Join'),
+            FadeIn(3.33, generateButton(context, 'Join')),
             Spacer(flex: 5),
-            generateButton(context, 'Create'),
+            FadeIn(3.66, generateButton(context, 'Create')),
             Spacer(flex: 50)
           ],
         )
@@ -79,6 +80,36 @@ class HomeScreen extends StatelessWidget{
           ),
         )
       )
+    );
+  }
+}
+
+class FadeIn extends StatelessWidget {
+  final double delay;
+  final Widget child;
+
+  FadeIn(this.delay, this.child);
+
+  @override
+  Widget build(BuildContext context) {
+    final tween = MultiTrackTween([
+      Track("opacity")
+        .add(Duration(milliseconds: 500), Tween(begin: 0.0, end: 1.0)),
+      Track("transelateX").add(
+        Duration(milliseconds: 500), Tween(begin: 130.0, end: 0.0),
+        curve: Curves.easeOut)
+    ]);
+
+    return ControlledAnimation(
+      delay: Duration(milliseconds: (300 * delay).round()),
+      duration: tween.duration,
+      tween: tween,
+      child: child,
+      builderWithChild: (context, child, animation) => Opacity(
+        opacity: animation["opacity"],
+        child: Transform.translate(
+          offset: Offset(animation["transelateX"], 0), child: child),
+      ),
     );
   }
 }
