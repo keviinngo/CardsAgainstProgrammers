@@ -11,11 +11,11 @@ class HomeScreen extends StatelessWidget{
           direction: Axis.vertical,
           children: <Widget>[
             Spacer(flex: 5),
-            FadeIn(2.0, titleCard(context)),
+            FadeIn(1.0, titleCard(context)),
             Spacer(flex: 10),
-            FadeIn(3.33, generateButton(context, 'Join')),
+            FadeIn(2.33, generateButton(context, 'Join')),
             Spacer(flex: 5),
-            FadeIn(3.66, generateButton(context, 'Create')),
+            FadeIn(2.66, generateButton(context, 'Create')),
             Spacer(flex: 50)
           ],
         )
@@ -96,7 +96,7 @@ class FadeIn extends StatelessWidget {
       Track("opacity")
         .add(Duration(milliseconds: 500), Tween(begin: 0.0, end: 1.0)),
       Track("transelateX").add(
-        Duration(milliseconds: 500), Tween(begin: 130.0, end: 0.0),
+        Duration(milliseconds: 500), Tween(begin: 330.0, end: 0.0),
         curve: Curves.easeOut)
     ]);
 
