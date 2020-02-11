@@ -157,7 +157,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
   final int maxPlayers = 16;
 
   List<String> players = List<String>();
-  String hostName;
+  String userName;
   String lobbyCode;
   bool isHost;
   LobbySettings settings;
@@ -180,7 +180,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
     super.initState();
     settings = LobbySettings();
 
-    hostName = widget.arguments['username'];
+    userName = widget.arguments['username'];
     conn = widget.arguments['connection'];
     conn.then((connection) {
       isHost = connection.isHost;
@@ -238,7 +238,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
 
       connection.onGameCreated = () {
         setState(() {
-          players = [hostName];
+          players = [userName];
           lobbyCode = connection.code;
         });
       };
@@ -252,10 +252,13 @@ class _LobbyScreenState extends State<LobbyScreen> {
       };
 
       connection.onStarted = () {
+        connection.onJoin = null;
         Navigator.of(context).pushReplacementNamed('/game',
         arguments: {
           'players': players,
-          'isHost': isHost
+          'isHost': isHost,
+          'userName': userName,
+          'conn': conn,
         });
       };
     });
@@ -264,7 +267,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
   // 
   Future<bool> confirmKick(BuildContext context, int index) async {
     // Show snackbar if the player kicked is yourself.
-    if (players[index] == hostName) {
+    if (players[index] == userName) {
       Scaffold.of(context).showSnackBar(SnackBar(
         content: Text('You cannot kick yourself.'),
         duration: Duration(seconds: 1),
@@ -335,7 +338,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
                   fontSize: 20,
                 ),
               ),
-              subtitle: players[index] != hostName ? Text('Swipe to kick', style: TextStyle(fontSize: 10),) : null,
+              subtitle: players[index] != userName ? Text('Swipe to kick', style: TextStyle(fontSize: 10),) : null,
             )
           ),
           Divider(),

@@ -22,6 +22,7 @@ class Connection {
   final WebSocket socket;
   ConnectionState state = ConnectionState.waitingForHello;
   List<Player> players = List<Player>();
+  List<Map<String, dynamic>> cards = List<Map<String, dynamic>>();
   String username;
   String code;
   bool isHost;
@@ -38,7 +39,9 @@ class Connection {
   void Function(List<String>) onJoinedGame;
   /// The callback that is called when a player is kicked.
   void Function() onKicked;
-  /// The callback that is called when the game is startng.
+  /// The callback that is called when the player gets a new hand of cards
+  void Function(List<Map<String, dynamic>>) onNewHand;
+  /// The callback that is called when the game is starting
   void Function() onStarted;
 
   /// Connection constructor.
@@ -149,7 +152,6 @@ class Connection {
 
         // Game starting
         if (json['message'] == 'game_starting' && onStarted != null) {
-          onStarted();
           state = ConnectionState.inGame;
         }
 
@@ -157,6 +159,12 @@ class Connection {
         // TODO: Handle this case.
         break;
         case ConnectionState.inGame:
+
+        // Getting a new hand
+        if (json['message'] == 'new_hand' && onNewHand != null) {
+          cards = json['hand'] as List<Map<String, dynamic>>;
+          onNewHand(cards);
+        }
 
         break;
     }
