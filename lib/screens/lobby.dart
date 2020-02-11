@@ -164,6 +164,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
   Future<Connection> conn;
 
   @override
+  /// Called when the Lobby widget is removed, close any remaining connections.
   void dispose() {
     super.dispose();
 

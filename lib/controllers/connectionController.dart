@@ -157,6 +157,7 @@ class Connection {
     sendJson({"message": "kick_player", "username": username});
   }
 
+  /// Creates a game and returns the new [Connection]
   static Future<Connection> createGame(String username) async {
     var socket = await WebSocket.connect("ws://$SERVER_ADDRESS:$SERVER_PORT$SERVER_PATH");
 
@@ -164,6 +165,7 @@ class Connection {
     return Connection(socket, true, username);
   }
 
+  /// Joings a game and returns the new [Connection]
   static Future<Connection> joinGame(String username, String code) async {
     var socket = await WebSocket.connect("ws://$SERVER_ADDRESS:$SERVER_PORT$SERVER_PATH");
 
@@ -171,6 +173,7 @@ class Connection {
     return Connection(socket, false, username, code: code);
   }
 
+  /// Checks if a code is valid. If it is the [Future<Connection>] yields a [Connection], otherwise it yields null
   static Future<Connection> checkCodeAndJoinGame(String username, String code) async {
     var socket = await WebSocket.connect("ws://$SERVER_ADDRESS:$SERVER_PORT$SERVER_PATH");
 
