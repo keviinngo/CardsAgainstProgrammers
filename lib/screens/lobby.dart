@@ -249,6 +249,12 @@ class _LobbyScreenState extends State<LobbyScreen> {
           lobbyCode = connection.code;
         });
       };
+
+      connection.onPromoted = () {
+        setState((){
+          isHost = true;
+        });
+      };
     });
   }
 
