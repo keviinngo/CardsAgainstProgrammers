@@ -100,7 +100,7 @@ class FadeIn extends StatelessWidget {
         .add(Duration(milliseconds: 500), Tween(begin: 0.0, end: 1.0)),
       //Translate on the x-axis from displaced to unmodified
       Track("transelateX").add(
-        Duration(milliseconds: 500), Tween(begin: 330.0, end: 0.0),
+        Duration(milliseconds: 500), Tween(begin: 600.0, end: 0.0),
         curve: Curves.easeOut)
     ]);
 
