@@ -176,6 +176,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
 
   @override
   void initState() {
+    isHost = false;
     super.initState();
     settings = LobbySettings();
 
@@ -435,7 +436,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
                     //TODO: Probably better with a grid layout or something!
                     Container(height: 40, child: VerticalDivider(color: Colors.black,)),
                     // Shows startgame button only when the player is a host.
-                    isHost ? startGame(conn) : Null,
+                    isHost ? startGame(conn) : Container(),
                   ],
                 )
               ),
