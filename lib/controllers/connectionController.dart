@@ -37,6 +37,8 @@ class Connection {
   void Function(List<String>) onJoinedGame;
   /// The callback is called when a player is kicked.
   void Function() onKicked;
+  /// The callback is called when the player is promoted to host
+  void Function() onPromoted;
 
   /// Connection constructor.
   /// 
@@ -144,6 +146,11 @@ class Connection {
         //Kicked
         if (json['message'] == 'kicked' && onKicked != null) {
           onKicked();
+        }
+
+        // Promoted to host by server
+        if(json['message'] == 'promoted_to_host' && onPromoted != null) {
+          onPromoted();
         }
 
         // 
