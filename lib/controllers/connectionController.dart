@@ -1,7 +1,8 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 
-const String SERVER_ADDRESS = "192.168.10.186";
+const String SERVER_ADDRESS = "10.97.60.108";
 const String SERVER_PATH = "/game";
 const int SERVER_PORT = 8080;
 
@@ -24,6 +25,7 @@ class Connection {
   String code;
   bool isHost;
   bool inLobby;
+  bool isValidCode;
 
   /// The callback that is called when a player joins the game.
   void Function(String) onJoin;
@@ -33,13 +35,15 @@ class Connection {
   void Function() onGameCreated;
   /// The callback that is called when you join a game.
   void Function(List<String>) onJoinedGame;
+  /// The callback is called when a player is kicked.
+  void Function() onKicked;
 
   /// Connection constructor.
   /// 
   /// Takes in arguments [socket], [isHost] and [username].
   ///
   /// named argument [code]
-  Connection(this.socket, this.isHost, this.username, {this.code}) {
+  Connection(this.socket, this.isHost, this.username, {this.code, this.isValidCode}) {
     socket.listen(onData);
   }
 
@@ -52,6 +56,7 @@ class Connection {
   void onData(dynamic obj) {
     if (!(obj is String)) {
       socket.close();
+      return;
     }
 
     String msg = obj as String;
@@ -62,10 +67,19 @@ class Connection {
     } catch(e) {
       sendJson({'message': 'invalid_json'});
       socket.close();
+      return;
     }
+
+    print("${this.username}: ${json.toString()}");
 
     if (json['message'] == 'bye') {
       socket.close();
+      return;
+    }
+
+    if (json['message'] == 'code_checked') {
+      // Ignore this I guess
+      return;
     }
 
     // Swtich case for each of the possible states of the game.
@@ -85,6 +99,7 @@ class Connection {
         break;
       case ConnectionState.joiningGame:
         // TODO: Handle this case.
+
         if (json['message'] != 'joined_game') {
           return;
         }
@@ -118,12 +133,17 @@ class Connection {
 
         // Joined
         if (json['message'] == 'joined' && onJoin != null) {
-          onJoin(json['user']);
+          onJoin(json['username']);
         }
 
         // Left
         if (json['message'] == 'left' && onLeft != null) {
-          onLeft(json['user']);
+          onLeft(json['username']);
+        }
+
+        //Kicked
+        if (json['message'] == 'kicked' && onKicked != null) {
+          onKicked();
         }
 
         // 
@@ -132,6 +152,12 @@ class Connection {
     }
   }
 
+  /// function to kick specific username
+  void kickPlayer (String username) {
+    sendJson({"message": "kick_player", "username": username});
+  }
+
+  /// Creates a game and returns the new [Connection]
   static Future<Connection> createGame(String username) async {
     var socket = await WebSocket.connect("ws://$SERVER_ADDRESS:$SERVER_PORT$SERVER_PATH");
 
@@ -139,11 +165,38 @@ class Connection {
     return Connection(socket, true, username);
   }
 
+  /// Joings a game and returns the new [Connection]
   static Future<Connection> joinGame(String username, String code) async {
     var socket = await WebSocket.connect("ws://$SERVER_ADDRESS:$SERVER_PORT$SERVER_PATH");
 
 
     return Connection(socket, false, username, code: code);
+  }
+
+  /// Checks if a code is valid. If it is the [Future<Connection>] yields a [Connection], otherwise it yields null
+  static Future<Connection> checkCodeAndJoinGame(String username, String code) async {
+    var socket = await WebSocket.connect("ws://$SERVER_ADDRESS:$SERVER_PORT$SERVER_PATH");
+
+    var completer = Completer<Connection>();
+
+    socket.listen((data) async {
+      var json = jsonDecode(data);
+      print(json);
+
+      if (json['message'] == 'code_checked') {
+        if (json['is_valid']) {
+          completer.complete(joinGame(username, code));
+        } else {
+          completer.complete(null);
+        }
+        socket.close();
+      }
+    }, onDone: () {
+      print('checkAndJoinGame: check code session failed');
+    });
+    socket.addUtf8Text(utf8.encode('{"message":"code_is_valid","code":"$code"}'));
+
+    return completer.future;
   }
 }
 

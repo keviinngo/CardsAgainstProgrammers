@@ -1,3 +1,4 @@
+import 'package:cap/controllers/connectionController.dart';
 import 'package:flutter/material.dart';
 
 
@@ -45,11 +46,12 @@ class CreateScreen extends StatelessWidget {
                   child: Text('Create'),
                   onPressed: () {
                     if (formKey.currentState.validate()) {
-                      print("Create game as ${nameController.text}");
+                      Future<Connection> conn = Connection.createGame('${nameController.text}');
                       Navigator.of(context).pushReplacementNamed(
                         '/lobby',
                         arguments: {
-                          'username': nameController.text,
+                          'connection': conn,
+                          'username': nameController.text
                         }
                       );
                     }

@@ -1,3 +1,4 @@
+import 'package:cap/controllers/connectionController.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -64,7 +65,17 @@ class JoinScreen extends StatelessWidget {
       borderRadius: BorderRadius.all(Radius.circular(10)),
       onTap: (() {
         if (formKey.currentState.validate()) {
-          print("Join ${codeController.text} as ${nameController.text}");
+          Future<Connection> conn = Connection.checkCodeAndJoinGame('${nameController.text}', '${codeController.text}');
+          conn.then((connection) {
+            if (connection != null) {
+              Navigator.of(context).pushReplacementNamed('/lobby', arguments: {
+                  'connection': conn,
+                  'username': nameController.text
+              });
+            } else {
+              print("nah bro");
+            }
+          });
         }
       }),
       child: Ink(

@@ -1,3 +1,4 @@
+import 'package:cap/controllers/connectionController.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -144,11 +145,11 @@ class LobbyScreen extends StatefulWidget {
   });
 
   @override
-  State<LobbyScreen> createState() => LobbyScreenState();
+  State<LobbyScreen> createState() => _LobbyScreenState();
 }
 
 
-class LobbyScreenState extends State<LobbyScreen> {
+class _LobbyScreenState extends State<LobbyScreen> {
   final TextEditingController nameController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final GlobalKey kickYourselfSnackbarKey = GlobalKey();
@@ -157,7 +158,21 @@ class LobbyScreenState extends State<LobbyScreen> {
 
   List<String> players = List<String>();
   String hostName;
+  String lobbyCode;
+  bool isHost;
   LobbySettings settings;
+  Future<Connection> conn;
+
+  @override
+  /// Called when the Lobby widget is removed, close any remaining connections.
+  void dispose() {
+    super.dispose();
+
+    conn.then((connection) {
+      connection.sendJson({'message': 'leave_game'});
+      connection.socket.close();
+    });
+  }
 
   @override
   void initState() {
@@ -165,21 +180,76 @@ class LobbyScreenState extends State<LobbyScreen> {
     settings = LobbySettings();
 
     hostName = widget.arguments['username'];
-    players = [
-      widget.arguments['username'],
-      'Tosha',
-      'Von',
-      'Renee',
-      'Chet',
-      'Stephany',
-      'Lolita',
-      'Roseanne',
-      'Delphia',
-      'Jacquline',
-      'Un',
-      'Martin',
-      'Simonne',
-    ];
+    conn = widget.arguments['connection'];
+    conn.then((connection) {
+      isHost = connection.isHost;
+
+      // connection.codeIsValidFuture.future.then((val) {
+      //   if(!val) {
+      //     Navigator.of(context).pushReplacementNamed('/join');
+      //     showDialog(
+      //       context: context,
+      //       builder: (context) {
+      //         return AlertDialog(
+      //           content: Text('Invalid game code.'),
+      //           actions: <Widget>[
+      //             FlatButton(
+      //               child: Text('Ok'),
+      //               onPressed: () {
+      //                 Navigator.of(context).pop();
+      //               },
+      //             )
+      //           ],
+      //         );
+      //       }
+      //     );
+      //   }
+      // });
+
+      connection.onJoin = (username) {
+        setState(() {
+          players.add(username);
+        });
+      };
+
+      connection.onLeft = (username) {
+        setState(() {
+          players.remove(username);
+        });
+      };
+
+      connection.onKicked = (){
+        setState(() {
+          showDialog(context: context, builder: (context){
+            return AlertDialog(
+              title: Text('Kicked'),
+              actions: <Widget>[
+                RaisedButton(
+                  onPressed: () {
+                    Navigator.of(context).pushReplacementNamed('/');
+                  },
+                )
+              ],
+            );
+          });
+        });
+      };
+
+      connection.onGameCreated = () {
+        setState(() {
+          players = [hostName];
+          lobbyCode = connection.code;
+        });
+      };
+
+      connection.onJoinedGame = (userList) {
+        print('joined game');
+        setState(() {
+          players = userList;
+          lobbyCode = connection.code;
+        });
+      };
+    });
   }
 
   // 
@@ -226,6 +296,7 @@ class LobbyScreenState extends State<LobbyScreen> {
   // Individual item in the [buildPlayerList] [ListView]
   Widget buildItem(BuildContext context, int index) {
     // Swipable tile for each player.
+    // TODO: not have dismissable for joining users.
     return Dismissible(
       key: GlobalKey(),
       resizeDuration: Duration(milliseconds: 200),
@@ -238,7 +309,9 @@ class LobbyScreenState extends State<LobbyScreen> {
       ),
       onDismissed: (DismissDirection direction) {
         setState((){
-          players.remove(players[index]);
+          conn.then((connection){
+            connection.kickPlayer(players[index]);
+          });
         });
       },
       confirmDismiss: (direction) async => confirmKick(context,index),
@@ -262,9 +335,29 @@ class LobbyScreenState extends State<LobbyScreen> {
     );
   }
 
-  // [ListView] of players in the lobby.
+  Widget playerListItem(index) {
+    return Column(
+        children: [
+          Container(
+            child: ListTile(
+              title: Text(
+                players[index],
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 20,
+                ),
+              ),
+            )
+          ),
+          Divider(),
+        ]
+    );
+  }
+
+  /// [ListView] of players in the lobby.
+  //TODO: Show an indication for users themselves
   Widget buildPlayerList() {
-    return Container(
+    return ClipRect(child: Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(2),
@@ -276,9 +369,9 @@ class LobbyScreenState extends State<LobbyScreen> {
         shrinkWrap: false,
         scrollDirection: Axis.vertical,
         itemCount: players.length,
-        itemBuilder: (context, index) => buildItem(context, index),
+        itemBuilder: (context, index) => isHost ? buildItem(context, index) : playerListItem(index),
       ),
-    );
+    ));
   }
 
   @override
@@ -312,7 +405,7 @@ class LobbyScreenState extends State<LobbyScreen> {
                 // Room code.
                 padding: EdgeInsets.all(5),
                 child: Text(
-                  "PEKI", //TODO: Code here
+                  "$lobbyCode", //TODO: Code here
                   style: TextStyle(
                     fontSize: 32,
                     fontFamily: 'monospace',
