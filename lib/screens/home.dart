@@ -84,6 +84,7 @@ class HomeScreen extends StatelessWidget{
   }
 }
 
+//A fade-in animation for the UI
 class FadeIn extends StatelessWidget {
   final double delay;
   final Widget child;
@@ -92,9 +93,12 @@ class FadeIn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //Tweens multiple properties at once
     final tween = MultiTrackTween([
+      //Setting opacity from invisible to fully visible
       Track("opacity")
         .add(Duration(milliseconds: 500), Tween(begin: 0.0, end: 1.0)),
+      //Translate on the x-axis from displaced to unmodified
       Track("transelateX").add(
         Duration(milliseconds: 500), Tween(begin: 330.0, end: 0.0),
         curve: Curves.easeOut)
@@ -105,6 +109,7 @@ class FadeIn extends StatelessWidget {
       duration: tween.duration,
       tween: tween,
       child: child,
+      //building the animated scene
       builderWithChild: (context, child, animation) => Opacity(
         opacity: animation["opacity"],
         child: Transform.translate(
