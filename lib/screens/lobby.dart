@@ -434,12 +434,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
                     ),
                     //TODO: Probably better with a grid layout or something!
                     Container(height: 40, child: VerticalDivider(color: Colors.black,)),
-                    RaisedButton(
-                      child: Text('Start Game'),
-                      onPressed: () {
-                        print('GOGOGOG');
-                      },
-                    ),
+                    // Shows startgame button only when the player is a host.
+                    isHost ? startGame(conn) : Null,
                   ],
                 )
               ),
@@ -449,6 +445,20 @@ class _LobbyScreenState extends State<LobbyScreen> {
           )
         )
       ),
+    );
+  }
+
+  /// Returns a button that sends the json message for starting the game.
+  Widget startGame(Future<Connection> conn) {
+    return RaisedButton(
+      onPressed: () {
+        conn.then((connection) {
+          connection.sendJson({
+            'message': 'start_game'
+          });
+        });
+      },
+      child: Text('Start game'),
     );
   }
 }
