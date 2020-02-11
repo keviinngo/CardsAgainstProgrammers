@@ -249,6 +249,14 @@ class _LobbyScreenState extends State<LobbyScreen> {
           lobbyCode = connection.code;
         });
       };
+
+      connection.onStarted = () {
+        Navigator.of(context).pushReplacementNamed('/game',
+        arguments: {
+          'players': players,
+          'isHost': isHost
+        });
+      };
     });
   }
 

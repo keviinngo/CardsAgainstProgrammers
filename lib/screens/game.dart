@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
-class JoinScreen extends StatelessWidget {
+class GameScreen extends StatelessWidget {
+  final Map<String, dynamic> arguments;
+
+  GameScreen({@required this.arguments});
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
