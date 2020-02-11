@@ -39,10 +39,14 @@ class Connection {
   void Function(List<String>) onJoinedGame;
   /// The callback that is called when a player is kicked.
   void Function() onKicked;
-  /// The callback that is called when the player gets a new hand of cards
+  /// The callback that is called when the player gets a new hand of cards.
   void Function(List<Map<String, dynamic>>) onNewHand;
-  /// The callback that is called when the game is starting
+  /// The callback that is called when the game is starting.
   void Function() onStarted;
+  /// The callback that is called when a new czard i chosen.
+  void Function(String) onNewCzar;
+  /// The callback that is called when new scores are set.
+  void Function(Map<String, int>) onNewScores;
 
   /// Connection constructor.
   /// 

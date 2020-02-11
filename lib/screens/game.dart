@@ -25,8 +25,8 @@ class _GameScreenState extends State<GameScreen>{
     userName = widget.arguments['userName'];
     isHost = widget.arguments['isHost'];
     conn = widget.arguments['conn'];
-    for (String player in widget.arguments['players']) {
-      players.add(Player(player, 0));
+    for (String playerName in widget.arguments['players']) {
+      players.add(Player(playerName, 0));
     }
 
     conn.then((connection) {
