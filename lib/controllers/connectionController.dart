@@ -11,7 +11,7 @@ enum ConnectionState {
   waitingForHello,
   creatingGame,
   inLobby,
-  joiningGame,
+  joiningGame
 }
 
 ///
@@ -35,8 +35,10 @@ class Connection {
   void Function() onGameCreated;
   /// The callback that is called when you join a game.
   void Function(List<String>) onJoinedGame;
-  /// The callback is called when a player is kicked.
+  /// The callback that is called when a player is kicked.
   void Function() onKicked;
+  /// The callback that is called when the game is startng.
+  void Function() onStart;
 
   /// Connection constructor.
   /// 
@@ -129,8 +131,6 @@ class Connection {
         inLobby = true;
         break;
       case ConnectionState.inLobby:
-        // Game starting
-
         // Joined
         if (json['message'] == 'joined' && onJoin != null) {
           onJoin(json['username']);
@@ -144,6 +144,11 @@ class Connection {
         //Kicked
         if (json['message'] == 'kicked' && onKicked != null) {
           onKicked();
+        }
+
+        // Game starting
+        if (json['message'] == 'starting' && onStart != null) {
+          onStart();
         }
 
         // 
