@@ -152,6 +152,7 @@ class Connection {
 
         // Game starting
         if (json['message'] == 'game_starting' && onStarted != null) {
+          onStarted();
           state = ConnectionState.inGame;
         }
 
