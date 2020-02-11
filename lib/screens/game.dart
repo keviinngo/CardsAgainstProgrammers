@@ -33,6 +33,20 @@ class _GameScreenState extends State<GameScreen>{
       connection.onNewHand = (newCards) {
         cards = newCards;
       };
+
+      connection.onNewCzar = (czar) {
+        if (czar == userName) {
+          // TODO: Implement this.
+        }
+      };
+
+      connection.onNewScores = (scores) {
+        players.clear();
+
+        scores.forEach((player, score) {
+          players.add(Player(player, score));
+        });
+      };
     });
   }
 

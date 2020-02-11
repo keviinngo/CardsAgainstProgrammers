@@ -171,6 +171,16 @@ class Connection {
           onNewHand(cards);
         }
 
+        // New card czar
+        if (json['message'] == 'new_czar' && onNewCzar != null) {
+          onNewCzar(json['username']);
+        }
+
+        // New scores are set
+        if (json['message'] == 'new_scores' && onNewScores != null) {
+          onNewScores(json['scores'] as Map<String, int>);
+        }
+
         break;
     }
   }
