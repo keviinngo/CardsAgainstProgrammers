@@ -157,29 +157,34 @@ class _LobbyScreenState extends State<LobbyScreen> {
   final int maxPlayers = 16;
 
   List<String> players = List<String>();
-  String hostName;
+  String userName;
   String lobbyCode;
   bool isHost;
   LobbySettings settings;
   Future<Connection> conn;
+  bool willDispose = true;
 
   @override
   /// Called when the Lobby widget is removed, close any remaining connections.
   void dispose() {
     super.dispose();
-
-    conn.then((connection) {
-      connection.sendJson({'message': 'leave_game'});
-      connection.socket.close();
-    });
+ 
+    if (willDispose) {
+      conn.then((connection) {
+        connection.sendJson({'message': 'leave_game'});
+        connection.socket.close();
+      });
+    }
+    willDispose = true;
   }
 
   @override
   void initState() {
+    isHost = false;
     super.initState();
     settings = LobbySettings();
 
-    hostName = widget.arguments['username'];
+    userName = widget.arguments['username'];
     conn = widget.arguments['connection'];
     conn.then((connection) {
       isHost = connection.isHost;
@@ -237,7 +242,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
 
       connection.onGameCreated = () {
         setState(() {
-          players = [hostName];
+          players = [userName];
           lobbyCode = connection.code;
         });
       };
@@ -249,7 +254,16 @@ class _LobbyScreenState extends State<LobbyScreen> {
           lobbyCode = connection.code;
         });
       };
-
+      connection.onStarted = () {
+        willDispose = false;
+        connection.onJoin = null;
+        Navigator.of(context).pushReplacementNamed('/game',
+        arguments: {
+          'players': players,
+          'isHost': isHost,
+          'userName': userName,
+          'conn': conn,
+        };
       connection.onPromoted = () {
         setState((){
           isHost = true;
@@ -261,7 +275,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
   // 
   Future<bool> confirmKick(BuildContext context, int index) async {
     // Show snackbar if the player kicked is yourself.
-    if (players[index] == hostName) {
+    if (players[index] == userName) {
       Scaffold.of(context).showSnackBar(SnackBar(
         content: Text('You cannot kick yourself.'),
         duration: Duration(seconds: 1),
@@ -332,7 +346,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
                   fontSize: 20,
                 ),
               ),
-              subtitle: players[index] != hostName ? Text('Swipe to kick', style: TextStyle(fontSize: 10),) : null,
+              subtitle: players[index] != userName ? Text('Swipe to kick', style: TextStyle(fontSize: 10),) : null,
             )
           ),
           Divider(),
@@ -432,12 +446,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
                     ),
                     //TODO: Probably better with a grid layout or something!
                     Container(height: 40, child: VerticalDivider(color: Colors.black,)),
-                    RaisedButton(
-                      child: Text('Start Game'),
-                      onPressed: () {
-                        print('GOGOGOG');
-                      },
-                    ),
+                    // Shows startgame button only when the player is a host.
+                    isHost ? startGame(conn) : Container(),
                   ],
                 )
               ),
@@ -447,6 +457,20 @@ class _LobbyScreenState extends State<LobbyScreen> {
           )
         )
       ),
+    );
+  }
+
+  /// Returns a button that sends the json message for starting the game.
+  Widget startGame(Future<Connection> conn) {
+    return RaisedButton(
+      onPressed: () {
+        conn.then((connection) {
+          connection.sendJson(
+            {"message": "start_game"}
+          );
+        });
+      },
+      child: Text('Start game'),
     );
   }
 }

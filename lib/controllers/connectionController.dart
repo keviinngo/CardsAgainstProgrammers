@@ -12,6 +12,7 @@ enum ConnectionState {
   creatingGame,
   inLobby,
   joiningGame,
+  inGame
 }
 
 ///
@@ -21,6 +22,7 @@ class Connection {
   final WebSocket socket;
   ConnectionState state = ConnectionState.waitingForHello;
   List<Player> players = List<Player>();
+  List<dynamic> cards = List<dynamic>();
   String username;
   String code;
   bool isHost;
@@ -35,8 +37,16 @@ class Connection {
   void Function() onGameCreated;
   /// The callback that is called when you join a game.
   void Function(List<String>) onJoinedGame;
-  /// The callback is called when a player is kicked.
+  /// The callback that is called when a player is kicked.
   void Function() onKicked;
+  /// The callback that is called when the player gets a new hand of cards.
+  void Function(List<dynamic>) onNewHand;
+  /// The callback that is called when the game is starting.
+  void Function() onStarted;
+  /// The callback that is called when a new czard i chosen.
+  void Function(String) onNewCzar;
+  /// The callback that is called when new scores are set.
+  void Function(Map<String, int>) onNewScores;
   /// The callback is called when the player is promoted to host
   void Function() onPromoted;
 
@@ -71,8 +81,6 @@ class Connection {
       socket.close();
       return;
     }
-
-    print("${this.username}: ${json.toString()}");
 
     if (json['message'] == 'bye') {
       socket.close();
@@ -131,8 +139,6 @@ class Connection {
         inLobby = true;
         break;
       case ConnectionState.inLobby:
-        // Game starting
-
         // Joined
         if (json['message'] == 'joined' && onJoin != null) {
           onJoin(json['username']);
@@ -147,7 +153,11 @@ class Connection {
         if (json['message'] == 'kicked' && onKicked != null) {
           onKicked();
         }
-
+        // Game starting
+        if (json['message'] == 'game_starting' && onStarted != null) {
+          onStarted();
+          state = ConnectionState.inGame;
+        }
         // Promoted to host by server
         if(json['message'] == 'promoted_to_host' && onPromoted != null) {
           onPromoted();
@@ -155,6 +165,25 @@ class Connection {
 
         // 
         // TODO: Handle this case.
+        break;
+        case ConnectionState.inGame:
+
+        // Getting a new hand
+        if (json['message'] == 'new_hand' && onNewHand != null) {
+          cards = json['hand'] as List<dynamic>;
+          onNewHand(cards);
+        }
+
+        // New card czar
+        if (json['message'] == 'new_czar' && onNewCzar != null) {
+          onNewCzar(json['username']);
+        }
+
+        // New scores are set
+        if (json['message'] == 'new_scores' && onNewScores != null) {
+          onNewScores(json['scores'] as Map<String, int>);
+        }
+
         break;
     }
   }
