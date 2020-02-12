@@ -76,7 +76,7 @@ class HomeScreen extends StatelessWidget{
           child: Text(
             '$text',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 25),
+            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
           ),
         )
       )
