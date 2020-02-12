@@ -79,21 +79,49 @@ class _GameScreenState extends State<GameScreen>{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        // Builds the list if we have cards, show an empty container if not.
-        child: showCards ? ListView.builder(
-          itemCount: cards.length,
-          itemBuilder: (BuildContext context, int index) {
-            return buildList(index);
-          } 
-        ) : Container(),
-      ),
+      body: Center(
+        child: SafeArea(
+          child: Flex(
+            direction: Axis.vertical,
+            children: <Widget>[
+              Container(
+                child: Text('skjer', textAlign: TextAlign.center,),
+              ),
+              Spacer(),
+              showCards ? Container(
+                height: MediaQuery.of(context).size.height * 0.2,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) {
+                    return buildList(context, index);
+                  },
+                  itemCount: cards.length,
+                ),
+              ) : CircularProgressIndicator(value: null,)
+            ],
+          )
+        )
+      )
     );
   }
 
   // The list of cards to be shown
-  Widget buildList(int index) {
-    return Row(
+  Widget buildList(BuildContext context, int index) {
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.2,
+      margin: EdgeInsets.fromLTRB(8, 0, 8, 5),
+      decoration: BoxDecoration(
+        border: Border.all(),
+        borderRadius: BorderRadius.circular(8),
+        color: Colors.white
+      ),
+      child: Container(
+        margin: EdgeInsets.all(2),
+        child: Text(cards[index].values.toList()[0]),
+      ),
+    );
+
+    /*return Row(
       children: <Widget>[
         Container(
           decoration: BoxDecoration(
@@ -104,6 +132,6 @@ class _GameScreenState extends State<GameScreen>{
           child: Text(cards[index].values.toList()[0]),
         )
       ],
-    );
+    );*/
   }
 }
