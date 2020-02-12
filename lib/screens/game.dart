@@ -36,6 +36,7 @@ class _GameScreenState extends State<GameScreen>{
   void initState() {
     super.initState();
 
+    // Gets necessary data from previous screen
     userName = widget.arguments['userName'];
     isHost = widget.arguments['isHost'];
     conn = widget.arguments['conn'];
@@ -70,6 +71,7 @@ class _GameScreenState extends State<GameScreen>{
         });
       };
 
+      // Sets up all the new methods before sending ready signal
       connection.sendJson({"message": "ready_to_start"});
     });
   }
@@ -78,6 +80,7 @@ class _GameScreenState extends State<GameScreen>{
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+        // Builds the list if we have cards, show an empty container if not.
         child: showCards ? ListView.builder(
           itemCount: cards.length,
           itemBuilder: (BuildContext context, int index) {
@@ -88,6 +91,7 @@ class _GameScreenState extends State<GameScreen>{
     );
   }
 
+  // The list of cards to be shown
   Widget buildList(int index) {
     return Row(
       children: <Widget>[
