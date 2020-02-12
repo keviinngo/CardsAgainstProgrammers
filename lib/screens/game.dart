@@ -2,6 +2,7 @@ import 'package:cap/controllers/connectionController.dart';
 import 'package:flutter/material.dart';
 
 class GameScreen extends StatefulWidget {
+  /// Arguments from the previous screen
   final Map<String, dynamic> arguments;
 
   GameScreen({@required this.arguments});
@@ -11,13 +12,20 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen>{
+  /// A list of cards the player has
   List<dynamic> cards;
 
+  /// List of players with their name and score
   List<Player> players = List<Player>();
+  /// Player's name
   String userName;
+  /// Indicates if the player is a host or not
   bool isHost;
+  /// The connection to the server
   Future<Connection> conn;
+  /// Indicates if the player is the Czar or not
   bool isCzar;
+  /// Indicates if we should draw the cards on screen or not
   bool showCards = false;
 
   @override
@@ -80,6 +88,7 @@ class _GameScreenState extends State<GameScreen>{
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
+        // SafeArea to nok draw under notch
         child: SafeArea(
           child: Flex(
             direction: Axis.vertical,
@@ -88,6 +97,7 @@ class _GameScreenState extends State<GameScreen>{
                 child: Text('skjer', textAlign: TextAlign.center,),
               ),
               Spacer(),
+              // Show the hand if we have it ready, show circual progress indicator if not
               showCards ? Container(
                 height: MediaQuery.of(context).size.height * 0.2,
                 child: ListView.builder(
