@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:simple_animations/simple_animations.dart';
 
 class HomeScreen extends StatelessWidget{
   // The Homepagescreen. The first screen after opening up the app.
@@ -10,11 +11,11 @@ class HomeScreen extends StatelessWidget{
           direction: Axis.vertical,
           children: <Widget>[
             Spacer(flex: 5),
-            titleCard(context),
+            FadeIn(1.0, titleCard(context)),
             Spacer(flex: 10),
-            generateButton(context, 'Join'),
+            FadeIn(2.33, generateButton(context, 'Join')),
             Spacer(flex: 5),
-            generateButton(context, 'Create'),
+            FadeIn(2.66, generateButton(context, 'Create')),
             Spacer(flex: 50)
           ],
         )
@@ -75,10 +76,45 @@ class HomeScreen extends StatelessWidget{
           child: Text(
             '$text',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 25),
+            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
           ),
         )
       )
+    );
+  }
+}
+
+//A fade-in animation for the UI
+class FadeIn extends StatelessWidget {
+  final double delay;
+  final Widget child;
+
+  FadeIn(this.delay, this.child);
+
+  @override
+  Widget build(BuildContext context) {
+    //Tweens multiple properties at once
+    final tween = MultiTrackTween([
+      //Setting opacity from invisible to fully visible
+      Track("opacity")
+        .add(Duration(milliseconds: 500), Tween(begin: 0.0, end: 1.0)),
+      //Translate on the x-axis from displaced to unmodified
+      Track("transelateX").add(
+        Duration(milliseconds: 500), Tween(begin: 600.0, end: 0.0),
+        curve: Curves.easeOut)
+    ]);
+
+    return ControlledAnimation(
+      delay: Duration(milliseconds: (300 * delay).round()),
+      duration: tween.duration,
+      tween: tween,
+      child: child,
+      //building the animated scene
+      builderWithChild: (context, child, animation) => Opacity(
+        opacity: animation["opacity"],
+        child: Transform.translate(
+          offset: Offset(animation["transelateX"], 0), child: child),
+      ),
     );
   }
 }

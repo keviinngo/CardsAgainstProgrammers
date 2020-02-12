@@ -10,18 +10,52 @@ class CreateScreen extends StatelessWidget {
   Widget buildNameField() {
     return TextFormField(
       controller: nameController,
-      maxLength: 64,
+      maxLength: 20,
       maxLengthEnforced: true,
       textAlign: TextAlign.center,
       decoration: InputDecoration(
-        hintText: 'Name',
-        border: OutlineInputBorder(),
+        hintText: '----',
+        border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
       ),
       inputFormatters: [],
       enableSuggestions: true,
       validator: (str) {
         return str.isEmpty ? "Need a name" : null;
       },
+    );
+  }
+
+  Widget createButton(context) {
+    return InkWell(
+      borderRadius: BorderRadius.all(Radius.circular(10)),
+      onTap: (() {
+        if (formKey.currentState.validate()) {
+          Future<Connection> conn = Connection.createGame('${nameController.text}');
+          Navigator.of(context).pushReplacementNamed(
+            '/lobby',
+            arguments: {
+              'connection': conn,
+              'username': nameController.text
+            }
+          );
+        }
+      }),
+      child: Ink(
+        width: 160,
+        height: 90,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: Colors.black, style:  BorderStyle.solid, width: 0.5),
+          borderRadius: BorderRadius.all(Radius.circular(10))
+        ),
+        child: Center(
+          child: Text(
+            'Create',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+        ),
+      ),
     );
   }
 
@@ -40,23 +74,11 @@ class CreateScreen extends StatelessWidget {
             key: formKey,
             child: Column(
               children: [
-                Padding(padding: EdgeInsets.only(top: 20),),
+                Padding(padding: EdgeInsets.only(top: 40),),
+                Text('ENTER YOUR NAME', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                Padding(padding: EdgeInsets.only(top: 10),),
                 buildNameField(),
-                RaisedButton(
-                  child: Text('Create'),
-                  onPressed: () {
-                    if (formKey.currentState.validate()) {
-                      Future<Connection> conn = Connection.createGame('${nameController.text}');
-                      Navigator.of(context).pushReplacementNamed(
-                        '/lobby',
-                        arguments: {
-                          'connection': conn,
-                          'username': nameController.text
-                        }
-                      );
-                    }
-                  },
-                ),
+                createButton(context)
               ]
             ),
           )

@@ -425,10 +425,11 @@ class _LobbyScreenState extends State<LobbyScreen> {
                 // Room code.
                 padding: EdgeInsets.all(5),
                 child: Text(
-                  "$lobbyCode", //TODO: Code here
+                  "Room code: $lobbyCode", //TODO: Code here
                   style: TextStyle(
                     fontSize: 32,
                     fontFamily: 'monospace',
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
@@ -437,6 +438,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
               Padding(
                 padding: EdgeInsets.all(5),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       'Players (${players.length}/$maxPlayers)',
@@ -444,8 +446,6 @@ class _LobbyScreenState extends State<LobbyScreen> {
                         fontSize: 24,
                       ),
                     ),
-                    //TODO: Probably better with a grid layout or something!
-                    Container(height: 40, child: VerticalDivider(color: Colors.black,)),
                     // Shows startgame button only when the player is a host.
                     isHost ? startGame(conn) : Container(),
                   ],
