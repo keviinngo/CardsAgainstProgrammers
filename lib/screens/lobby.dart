@@ -402,7 +402,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
         title: Text('Lobby'),
         actions: <Widget>[
           // Button to open the settings dialog.
-          IconButton(
+          isHost ? IconButton(
             icon: Icon(Icons.settings),
             onPressed: () {
               showDialog(
@@ -412,7 +412,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
                 },
               );
             },
-          )
+          ) : Container()
         ],
       ),
       body: Center(
