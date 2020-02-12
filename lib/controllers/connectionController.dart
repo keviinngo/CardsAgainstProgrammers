@@ -59,7 +59,6 @@ class Connection {
 
   /// Sends an json object to the server.
   void sendJson(Object obj) {
-    print("sending: " + obj.toString());
     socket.addUtf8Text(utf8.encode(json.encode(obj)));
   }
 
@@ -69,8 +68,6 @@ class Connection {
       socket.close();
       return;
     }
-
-    print("recieving: " + obj.toString());
 
     String msg = obj as String;
 
