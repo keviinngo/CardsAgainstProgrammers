@@ -22,7 +22,7 @@ class Connection {
   final WebSocket socket;
   ConnectionState state = ConnectionState.waitingForHello;
   List<Player> players = List<Player>();
-  List<Map<String, dynamic>> cards = List<Map<String, dynamic>>();
+  List<dynamic> cards = List<dynamic>();
   String username;
   String code;
   bool isHost;
@@ -40,7 +40,7 @@ class Connection {
   /// The callback that is called when a player is kicked.
   void Function() onKicked;
   /// The callback that is called when the player gets a new hand of cards.
-  void Function(List<Map<String, dynamic>>) onNewHand;
+  void Function(List<dynamic>) onNewHand;
   /// The callback that is called when the game is starting.
   void Function() onStarted;
   /// The callback that is called when a new czard i chosen.
@@ -59,6 +59,7 @@ class Connection {
 
   /// Sends an json object to the server.
   void sendJson(Object obj) {
+    print("sending: " + obj.toString());
     socket.addUtf8Text(utf8.encode(json.encode(obj)));
   }
 
@@ -68,6 +69,8 @@ class Connection {
       socket.close();
       return;
     }
+
+    print("recieving: " + obj.toString());
 
     String msg = obj as String;
 
@@ -79,8 +82,6 @@ class Connection {
       socket.close();
       return;
     }
-
-    print("${this.username}: ${json.toString()}");
 
     if (json['message'] == 'bye') {
       socket.close();
@@ -167,7 +168,7 @@ class Connection {
 
         // Getting a new hand
         if (json['message'] == 'new_hand' && onNewHand != null) {
-          cards = json['hand'] as List<Map<String, dynamic>>;
+          cards = json['hand'] as List<dynamic>;
           onNewHand(cards);
         }
 

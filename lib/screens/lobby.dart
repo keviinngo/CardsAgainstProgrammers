@@ -162,16 +162,20 @@ class _LobbyScreenState extends State<LobbyScreen> {
   bool isHost;
   LobbySettings settings;
   Future<Connection> conn;
+  bool willDispose = true;
 
   @override
   /// Called when the Lobby widget is removed, close any remaining connections.
   void dispose() {
     super.dispose();
-
-    conn.then((connection) {
-      connection.sendJson({'message': 'leave_game'});
-      connection.socket.close();
-    });
+ 
+    if (willDispose) {
+      conn.then((connection) {
+        connection.sendJson({'message': 'leave_game'});
+        connection.socket.close();
+      });
+    }
+    willDispose = true;
   }
 
   @override
@@ -252,6 +256,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
       };
 
       connection.onStarted = () {
+        willDispose = false;
         connection.onJoin = null;
         Navigator.of(context).pushReplacementNamed('/game',
         arguments: {
@@ -457,9 +462,9 @@ class _LobbyScreenState extends State<LobbyScreen> {
     return RaisedButton(
       onPressed: () {
         conn.then((connection) {
-          connection.sendJson({
-            'message': 'start_game'
-          });
+          connection.sendJson(
+            {"message": "start_game"}
+          );
         });
       },
       child: Text('Start game'),
