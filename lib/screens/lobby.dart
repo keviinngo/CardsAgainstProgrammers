@@ -263,7 +263,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
           'isHost': isHost,
           'userName': userName,
           'conn': conn,
-        };
+        });
+      };
       connection.onPromoted = () {
         setState((){
           isHost = true;
