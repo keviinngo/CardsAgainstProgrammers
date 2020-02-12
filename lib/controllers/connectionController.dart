@@ -12,6 +12,7 @@ enum ConnectionState {
   creatingGame,
   inLobby,
   joiningGame,
+  inGame
 }
 
 ///
@@ -21,6 +22,7 @@ class Connection {
   final WebSocket socket;
   ConnectionState state = ConnectionState.waitingForHello;
   List<Player> players = List<Player>();
+  List<dynamic> cards = List<dynamic>();
   String username;
   String code;
   bool isHost;
@@ -35,8 +37,18 @@ class Connection {
   void Function() onGameCreated;
   /// The callback that is called when you join a game.
   void Function(List<String>) onJoinedGame;
-  /// The callback is called when a player is kicked.
+  /// The callback that is called when a player is kicked.
   void Function() onKicked;
+  /// The callback that is called when the player gets a new hand of cards.
+  void Function(List<dynamic>) onNewHand;
+  /// The callback that is called when the game is starting.
+  void Function() onStarted;
+  /// The callback that is called when a new czard i chosen.
+  void Function(String) onNewCzar;
+  /// The callback that is called when new scores are set.
+  void Function(Map<String, int>) onNewScores;
+  /// The callback is called when the player is promoted to host
+  void Function() onPromoted;
 
   /// Connection constructor.
   /// 
@@ -69,8 +81,6 @@ class Connection {
       socket.close();
       return;
     }
-
-    print("${this.username}: ${json.toString()}");
 
     if (json['message'] == 'bye') {
       socket.close();
@@ -129,8 +139,6 @@ class Connection {
         inLobby = true;
         break;
       case ConnectionState.inLobby:
-        // Game starting
-
         // Joined
         if (json['message'] == 'joined' && onJoin != null) {
           onJoin(json['username']);
@@ -145,9 +153,37 @@ class Connection {
         if (json['message'] == 'kicked' && onKicked != null) {
           onKicked();
         }
+        // Game starting
+        if (json['message'] == 'game_starting' && onStarted != null) {
+          onStarted();
+          state = ConnectionState.inGame;
+        }
+        // Promoted to host by server
+        if(json['message'] == 'promoted_to_host' && onPromoted != null) {
+          onPromoted();
+        }
 
         // 
         // TODO: Handle this case.
+        break;
+        case ConnectionState.inGame:
+
+        // Getting a new hand
+        if (json['message'] == 'new_hand' && onNewHand != null) {
+          cards = json['hand'] as List<dynamic>;
+          onNewHand(cards);
+        }
+
+        // New card czar
+        if (json['message'] == 'new_czar' && onNewCzar != null) {
+          onNewCzar(json['username']);
+        }
+
+        // New scores are set
+        if (json['message'] == 'new_scores' && onNewScores != null) {
+          onNewScores(json['scores'] as Map<String, int>);
+        }
+
         break;
     }
   }
@@ -157,6 +193,7 @@ class Connection {
     sendJson({"message": "kick_player", "username": username});
   }
 
+  /// Creates a game and returns the new [Connection]
   static Future<Connection> createGame(String username) async {
     var socket = await WebSocket.connect("ws://$SERVER_ADDRESS:$SERVER_PORT$SERVER_PATH");
 
@@ -164,6 +201,7 @@ class Connection {
     return Connection(socket, true, username);
   }
 
+  /// Joings a game and returns the new [Connection]
   static Future<Connection> joinGame(String username, String code) async {
     var socket = await WebSocket.connect("ws://$SERVER_ADDRESS:$SERVER_PORT$SERVER_PATH");
 
@@ -171,6 +209,7 @@ class Connection {
     return Connection(socket, false, username, code: code);
   }
 
+  /// Checks if a code is valid. If it is the [Future<Connection>] yields a [Connection], otherwise it yields null
   static Future<Connection> checkCodeAndJoinGame(String username, String code) async {
     var socket = await WebSocket.connect("ws://$SERVER_ADDRESS:$SERVER_PORT$SERVER_PATH");
 

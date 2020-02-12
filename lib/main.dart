@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cap/screens/home.dart';
 import 'package:cap/screens/create.dart';
+import 'package:cap/screens/game.dart';
 
 // Runs MyApp.
 void main() => runApp(RootScreen());
@@ -39,7 +40,13 @@ class RootScreen extends StatelessWidget {
             return LobbyScreen(arguments: settings.arguments as Map<String, dynamic>);
           });
           break;
+          case '/game':
+          return MaterialPageRoute(builder:  (_) {
+            return GameScreen(arguments: settings.arguments as Map<String, dynamic>);
+          });
+          break;
         }
+        
       },
       theme: ThemeData(
         primarySwatch: customColor,
