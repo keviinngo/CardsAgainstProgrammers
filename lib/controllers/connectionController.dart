@@ -47,6 +47,8 @@ class Connection {
   void Function(String) onNewCzar;
   /// The callback that is called when new scores are set.
   void Function(Map<String, int>) onNewScores;
+  /// The callback is called when the player is promoted to host
+  void Function() onPromoted;
 
   /// Connection constructor.
   /// 
@@ -151,11 +153,14 @@ class Connection {
         if (json['message'] == 'kicked' && onKicked != null) {
           onKicked();
         }
-
         // Game starting
         if (json['message'] == 'game_starting' && onStarted != null) {
           onStarted();
           state = ConnectionState.inGame;
+        }
+        // Promoted to host by server
+        if(json['message'] == 'promoted_to_host' && onPromoted != null) {
+          onPromoted();
         }
 
         // 

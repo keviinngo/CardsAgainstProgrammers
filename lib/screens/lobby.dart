@@ -254,7 +254,6 @@ class _LobbyScreenState extends State<LobbyScreen> {
           lobbyCode = connection.code;
         });
       };
-
       connection.onStarted = () {
         willDispose = false;
         connection.onJoin = null;
@@ -264,6 +263,10 @@ class _LobbyScreenState extends State<LobbyScreen> {
           'isHost': isHost,
           'userName': userName,
           'conn': conn,
+        };
+      connection.onPromoted = () {
+        setState((){
+          isHost = true;
         });
       };
     });
