@@ -163,6 +163,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
   LobbySettings settings;
   Future<Connection> conn;
   bool willDispose = true;
+  bool loading = true;
 
   @override
   /// Called when the Lobby widget is removed, close any remaining connections.
@@ -244,6 +245,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
         setState(() {
           players = [userName];
           lobbyCode = connection.code;
+          loading = false;
         });
       };
 
@@ -252,6 +254,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
         setState(() {
           players = userList;
           lobbyCode = connection.code;
+          loading = false;
         });
       };
       connection.onStarted = () {
@@ -420,7 +423,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
           constraints: BoxConstraints(
             maxWidth: 400,
           ),
-          child: Column(
+          child: !loading ? Column(
             children: <Widget>[
               Padding(
                 // Room code.
@@ -455,7 +458,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
               // Listview of current players in the lobby.
               Expanded(child: buildPlayerList()),
             ]
-          )
+          ) : CircularProgressIndicator(value: null)
         )
       ),
     );
