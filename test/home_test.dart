@@ -38,16 +38,6 @@ void main() {
                 return CreateScreen();
               });
               break;
-            case '/lobby':
-              return MaterialPageRoute(builder: (_) {
-                return LobbyScreen(arguments: settings.arguments as Map<String, dynamic>);
-              });
-              break;
-            case '/game':
-              return MaterialPageRoute(builder:  (_) {
-                return GameScreen(arguments: settings.arguments as Map<String, dynamic>);
-              });
-              break;
             default:
               return CupertinoPageRoute(builder: (_) {
                 return HomeScreen();
@@ -86,8 +76,6 @@ void main() {
       verify(mockObserver.didPush(any, any));
 
       expect(find.byType(JoinScreen), findsOneWidget);
-
-      expect(find.byType(TextFormField), findsWidgets);
     });
 
     testWidgets(
@@ -99,8 +87,6 @@ void main() {
         verify(mockObserver.didPush(any, any));
 
         expect(find.byType(CreateScreen), findsOneWidget);
-
-        expect(find.byType(TextFormField), findsOneWidget);
       });
   });
 }
