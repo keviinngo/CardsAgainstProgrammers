@@ -153,6 +153,10 @@ class _LobbyScreenState extends State<LobbyScreen> {
   final TextEditingController nameController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final GlobalKey kickYourselfSnackbarKey = GlobalKey();
+  final GlobalKey<AnimatedListState> playerListKey = GlobalKey();
+
+  final Tween<Offset> slideIn = Tween<Offset>(begin: Offset(-1, 0), end: Offset.zero);
+  final Tween<Offset> slideOut = Tween<Offset>(begin: Offset(1, 0), end: Offset.zero);
 
   final int maxPlayers = 16;
 
@@ -215,12 +219,17 @@ class _LobbyScreenState extends State<LobbyScreen> {
       connection.onJoin = (username) {
         setState(() {
           players.add(username);
+          playerListKey.currentState.insertItem(players.length-1);
         });
       };
 
       connection.onLeft = (username) {
         setState(() {
+          int index = players.indexOf(username);
           players.remove(username);
+          playerListKey.currentState.removeItem(index, (context, animation) {
+            return buildItem(context, username, true, animation);
+          });
         });
       };
 
@@ -277,9 +286,9 @@ class _LobbyScreenState extends State<LobbyScreen> {
   }
 
   // 
-  Future<bool> confirmKick(BuildContext context, int index) async {
+  Future<bool> confirmKick(BuildContext context, String player) async {
     // Show snackbar if the player kicked is yourself.
-    if (players[index] == userName) {
+    if (player == userName) {
       Scaffold.of(context).showSnackBar(SnackBar(
         content: Text('You cannot kick yourself.'),
         duration: Duration(seconds: 1),
@@ -318,12 +327,14 @@ class _LobbyScreenState extends State<LobbyScreen> {
   }
 
   // Individual item in the [buildPlayerList] [ListView]
-  Widget buildItem(BuildContext context, int index) {
+  Widget buildItem(BuildContext context, String player, bool removed, Animation<double> animation) {
     // Swipable tile for each player.
     // TODO: not have dismissable for joining users.
     return Dismissible(
       key: GlobalKey(),
-      resizeDuration: Duration(milliseconds: 200),
+      resizeDuration: null,
+      direction: DismissDirection.startToEnd,
+      movementDuration: Duration(milliseconds: 200),
 
       background: Container(
         color: Colors.red,
@@ -334,47 +345,31 @@ class _LobbyScreenState extends State<LobbyScreen> {
       onDismissed: (DismissDirection direction) {
         setState((){
           conn.then((connection){
-            connection.kickPlayer(players[index]);
+            connection.kickPlayer(player);
           });
         });
       },
-      confirmDismiss: (direction) async => confirmKick(context,index),
-      child: Column(
-        children: [
-          Container(
-            child: ListTile(
-              title: Text(
-                players[index],
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 20,
+      confirmDismiss: (direction) async => confirmKick(context, player),
+      child: SlideTransition(
+        position: removed ? slideOut.animate(animation) : slideIn.animate(animation),
+        child: Column(
+          children: [
+            Container(
+              child: ListTile(
+                title: Text(
+                  player,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 20,
+                  ),
                 ),
-              ),
-              subtitle: players[index] != userName ? Text('Swipe to kick', style: TextStyle(fontSize: 10),) : null,
-            )
-          ),
-          Divider(),
-        ]
+                subtitle: isHost ? player != userName ? Text('Swipe to kick', style: TextStyle(fontSize: 10),) : null : null,
+              )
+            ),
+            Divider(),
+          ]
+        )
       )
-    );
-  }
-
-  Widget playerListItem(index) {
-    return Column(
-        children: [
-          Container(
-            child: ListTile(
-              title: Text(
-                players[index],
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 20,
-                ),
-              ),
-            )
-          ),
-          Divider(),
-        ]
     );
   }
 
@@ -389,11 +384,12 @@ class _LobbyScreenState extends State<LobbyScreen> {
         ),
         border: Border.fromBorderSide(BorderSide(color: Theme.of(context).dividerColor)),
       ),
-      child: ListView.builder(
+      child: AnimatedList(
+        key: playerListKey,
         shrinkWrap: false,
         scrollDirection: Axis.vertical,
-        itemCount: players.length,
-        itemBuilder: (context, index) => isHost ? buildItem(context, index) : playerListItem(index),
+        initialItemCount: players.length,
+        itemBuilder: (context, index, animation) => buildItem(context, players[index], false, animation),
       ),
     ));
   }
