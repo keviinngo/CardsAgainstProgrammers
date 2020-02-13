@@ -324,6 +324,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
     return Dismissible(
       key: GlobalKey(),
       resizeDuration: Duration(milliseconds: 200),
+      direction: DismissDirection.startToEnd,
 
       background: Container(
         color: Colors.red,
