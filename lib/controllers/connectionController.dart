@@ -2,9 +2,10 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 
-const String SERVER_ADDRESS = "git.thebirk.net";
+const String SERVER_PROTOCOL = "wss://";
+const String SERVER_ADDRESS = "cap.thebirk.net";
 const String SERVER_PATH = "/game";
-const int SERVER_PORT = 8080;
+const int SERVER_PORT = 443;
 
 /// All the possibe states the client can be in.
 enum ConnectionState {
@@ -195,7 +196,7 @@ class Connection {
 
   /// Creates a game and returns the new [Connection]
   static Future<Connection> createGame(String username) async {
-    var socket = await WebSocket.connect("ws://$SERVER_ADDRESS:$SERVER_PORT$SERVER_PATH");
+    var socket = await WebSocket.connect("$SERVER_PROTOCOL$SERVER_ADDRESS:$SERVER_PORT$SERVER_PATH");
 
 
     return Connection(socket, true, username);
@@ -203,7 +204,7 @@ class Connection {
 
   /// Joings a game and returns the new [Connection]
   static Future<Connection> joinGame(String username, String code) async {
-    var socket = await WebSocket.connect("ws://$SERVER_ADDRESS:$SERVER_PORT$SERVER_PATH");
+    var socket = await WebSocket.connect("$SERVER_PROTOCOL$SERVER_ADDRESS:$SERVER_PORT$SERVER_PATH");
 
 
     return Connection(socket, false, username, code: code);
@@ -211,7 +212,7 @@ class Connection {
 
   /// Checks if a code is valid. If it is the [Future<Connection>] yields a [Connection], otherwise it yields null
   static Future<Connection> checkCodeAndJoinGame(String username, String code) async {
-    var socket = await WebSocket.connect("ws://$SERVER_ADDRESS:$SERVER_PORT$SERVER_PATH");
+    var socket = await WebSocket.connect("$SERVER_PROTOCOL$SERVER_ADDRESS:$SERVER_PORT$SERVER_PATH");
 
     var completer = Completer<Connection>();
 
