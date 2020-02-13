@@ -1,7 +1,11 @@
+import 'package:cap/screens/join.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_animations/simple_animations.dart';
 
 class HomeScreen extends StatelessWidget{
+  static const navigateToJoinKey = Key('navigateToJoin');
+  static const navigateToCreateKey = Key('navigateToCreate');
+
   // The Homepagescreen. The first screen after opening up the app.
   @override
   Widget build(BuildContext context) {
@@ -13,9 +17,9 @@ class HomeScreen extends StatelessWidget{
             Spacer(flex: 5),
             FadeIn(1.0, titleCard(context)),
             Spacer(flex: 10),
-            FadeIn(2.33, generateButton(context, 'Join')),
+            FadeIn(2.33, joinButton(context)),
             Spacer(flex: 5),
-            FadeIn(2.66, generateButton(context, 'Create')),
+            FadeIn(2.66, createButton(context)),
             Spacer(flex: 50)
           ],
         )
@@ -57,12 +61,14 @@ class HomeScreen extends StatelessWidget{
   }
 
   // TODO: Aspect ratio
-  /// Creates a button with a route to the same name with the text `text`
-  Widget generateButton(context, String text) {
+
+  /// [InkWell] button that sends you to the join screen
+  Widget joinButton(context) {
     return InkWell(
+      key: navigateToJoinKey,
       borderRadius: BorderRadius.all(Radius.circular(10)),
       onTap: (() {
-        Navigator.pushNamed(context, '/${text.toLowerCase()}');
+        Navigator.of(context).pushNamed('/join');
       }),
       child: Ink(
         width: 160,
@@ -74,7 +80,34 @@ class HomeScreen extends StatelessWidget{
         ),
         child: Center(
           child: Text(
-            '$text',
+            'Join',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+          ),
+        )
+      )
+    );
+  }
+
+  /// [InkWell] button that sends you to the create screen
+  Widget createButton(context) {
+    return InkWell(
+      key: navigateToCreateKey,
+      borderRadius: BorderRadius.all(Radius.circular(10)),
+      onTap: (() {
+        Navigator.of(context).pushNamed('/create');
+      }),
+      child: Ink(
+        width: 160,
+        height: 90,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: Colors.black, style: BorderStyle.solid, width: 0.5),
+          borderRadius: BorderRadius.all(Radius.circular(10))
+        ),
+        child: Center(
+          child: Text(
+            'Create',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
           ),
