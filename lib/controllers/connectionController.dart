@@ -229,7 +229,9 @@ class Connection {
         socket.close();
       }
     }, onDone: () {
-      print('checkAndJoinGame: check code session failed');
+      if (!completer.isCompleted) {
+        completer.complete(null);
+      }
     });
     socket.addUtf8Text(utf8.encode('{"message":"code_is_valid","code":"$code"}'));
 

@@ -18,6 +18,7 @@ class JoinScreen extends StatelessWidget {
   final TextEditingController codeController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   Widget buildCodeField() {
     return TextFormField(
@@ -75,7 +76,11 @@ class JoinScreen extends StatelessWidget {
                   'username': nameController.text
               });
             } else {
-              print("nah bro");
+              scaffoldKey.currentState.showSnackBar(SnackBar(
+                content: Text('No active game with code ${codeController.text}'),
+                duration: Duration(seconds: 4),
+                behavior: SnackBarBehavior.floating,
+              ));
             }
           });
         }
@@ -102,6 +107,7 @@ class JoinScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
         title: Text('Join'),
       ),
