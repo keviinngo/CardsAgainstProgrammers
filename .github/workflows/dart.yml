@@ -8,12 +8,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
-    - uses: subosito/flutter-action@v1
+      - uses: actions/checkout@v1
+      - uses: subosito/flutter-action@v1
         with:
-          flutter-version: '1.12.14'
-          channel: 'dev'
-    - name: Install dependencies
-      run: flutter pub get
-    - name: Run tests
-      run: flutter pub run test
+          flutter-version: '1.13.g'
+          channel: 'beta'
+
+      - run: flutter pub get
+      - run: flutter pub run test
