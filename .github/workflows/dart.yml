@@ -3,15 +3,16 @@ name: Dart CI
 on: [push]
 
 jobs:
-  build:
+  teset:
 
     runs-on: ubuntu-latest
 
-    container:
-      image:  google/dart:latest
-
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v1
+    - uses: subosito/flutter-action@v1
+        with:
+          flutter-version: '1.12.14'
+          channel: 'dev'
     - name: Install dependencies
       run: flutter pub get
     - name: Run tests
