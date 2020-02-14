@@ -15,4 +15,4 @@ jobs:
           channel: 'beta'
 
       - run: flutter pub get
-      - run: flutter pub run test
+      - run: flutter test
