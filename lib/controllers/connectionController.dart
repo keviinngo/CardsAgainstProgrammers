@@ -83,6 +83,8 @@ class Connection {
       return;
     }
 
+    print(json);
+
     if (json['message'] == 'bye') {
       socket.close();
       return;
@@ -91,6 +93,22 @@ class Connection {
     if (json['message'] == 'code_checked') {
       // Ignore this I guess
       return;
+    }
+
+    //TODO: This can get lost when tranistioning from Lobby to Game
+    // Joined
+    if (json['message'] == 'joined' && onJoin != null) {
+      onJoin(json['username']);
+    }
+
+    // Left
+    if (json['message'] == 'left' && onLeft != null) {
+      onLeft(json['username']);
+    }
+
+    //Kicked
+    if (json['message'] == 'kicked' && onKicked != null) {
+      onKicked();
     }
 
     // Swtich case for each of the possible states of the game.
@@ -140,20 +158,6 @@ class Connection {
         inLobby = true;
         break;
       case ConnectionState.inLobby:
-        // Joined
-        if (json['message'] == 'joined' && onJoin != null) {
-          onJoin(json['username']);
-        }
-
-        // Left
-        if (json['message'] == 'left' && onLeft != null) {
-          onLeft(json['username']);
-        }
-
-        //Kicked
-        if (json['message'] == 'kicked' && onKicked != null) {
-          onKicked();
-        }
         // Game starting
         if (json['message'] == 'game_starting' && onStarted != null) {
           onStarted();
