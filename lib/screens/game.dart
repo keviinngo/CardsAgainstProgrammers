@@ -97,13 +97,15 @@ class _GameScreenState extends State<GameScreen>{
       };
 
       connection.onNewCzar = (czar) {
-        this.currentCzar = czar;
-        if (czar == userName) {
-          // TODO: Implement this.
-          isCzar = true;
-        } else {
-          isCzar = false;
-        }
+        setState(() {
+          this.currentCzar = czar;
+          if (czar == userName) {
+            // TODO: Implement this.
+            isCzar = true;
+          } else {
+            isCzar = false;
+          }
+        });
       };
 
       connection.onNewScores = (scores) {
@@ -113,8 +115,6 @@ class _GameScreenState extends State<GameScreen>{
           scores.forEach((player, score) {
             players.add(Player(player, score));
           });
-
-          setState(() {});
         });
       };
       
