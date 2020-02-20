@@ -81,10 +81,10 @@ class _GameScreenState extends State<GameScreen>{
           state = GameState.annoucing_winner;
           winnerUsername = winner;
 
-          Future.delayed(Duration(seconds: 4), () {
-            setState(() {
-              state = GameState.submit_cards;
-            });
+        });
+        Future.delayed(Duration(seconds: 4), () {
+          setState(() {
+            state = GameState.submit_cards;
           });
         });
       };
