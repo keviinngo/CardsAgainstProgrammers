@@ -113,6 +113,8 @@ class _GameScreenState extends State<GameScreen>{
           scores.forEach((player, score) {
             players.add(Player(player, score));
           });
+
+          setState(() {});
         });
       };
       
