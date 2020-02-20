@@ -50,6 +50,10 @@ class Connection {
   void Function(Map<String, int>) onNewScores;
   /// The callback is called when the player is promoted to host
   void Function() onPromoted;
+  /// The callback is called when all players have submitted cards
+  void Function(List<dynamic>) onSubmittedCards;
+  /// The callback is called when a winner is picked
+  void Function(String) onWinner;
 
   /// Connection constructor.
   /// 
@@ -171,7 +175,7 @@ class Connection {
         // 
         // TODO: Handle this case.
         break;
-        case ConnectionState.inGame:
+      case ConnectionState.inGame:
 
         // Getting a new hand
         if (json['message'] == 'new_hand' && onNewHand != null) {
@@ -187,6 +191,14 @@ class Connection {
         // New scores are set
         if (json['message'] == 'new_scores' && onNewScores != null) {
           onNewScores(json['scores'] as Map<String, int>);
+        }
+
+        if (json['message'] == 'submitted_cards' && onSubmittedCards != null) {
+          onSubmittedCards(json['cards']);
+        }
+
+        if (json['message'] == 'winner_announce' && onWinner != null) {
+          onWinner(json['winner']);
         }
 
         break;

@@ -1,8 +1,13 @@
+import 'dart:math';
+
 import 'package:cap/controllers/connectionController.dart';
 import 'package:flutter/material.dart';
 
 enum GameState {
   submit_cards,
+  wait_for_others_to_submit,
+  wait_for_czar_pick,
+  annoucing_winner,
 }
 
 class GameScreen extends StatefulWidget {
@@ -18,6 +23,8 @@ class GameScreen extends StatefulWidget {
 class _GameScreenState extends State<GameScreen>{
   /// A list of cards the player has
   List<dynamic> cards;
+  /// A list of submitted cards
+  List<dynamic> submittedCards;
   /// List of players with their name and score
   List<Player> players = List<Player>();
   /// Player's name
@@ -34,6 +41,8 @@ class _GameScreenState extends State<GameScreen>{
   GameState state = GameState.submit_cards;
   /// Name of the current czar
   String currentCzar;
+  /// Name of the user that won the current round
+  String winnerUsername;
 
   @override
   /// Called when the Lobby widget is removed, close any remaining connections.
@@ -60,6 +69,26 @@ class _GameScreenState extends State<GameScreen>{
     }
 
     conn.then((connection) {
+      connection.onSubmittedCards = (cards) {
+        setState(() {
+          state = GameState.wait_for_czar_pick;
+          submittedCards = cards;
+        });
+      };
+
+      connection.onWinner = (winner) {
+        setState(() {
+          state = GameState.annoucing_winner;
+          winnerUsername = winner;
+
+          Future.delayed(Duration(seconds: 4), () {
+            setState(() {
+              state = GameState.submit_cards;
+            });
+          });
+        });
+      };
+
       connection.onNewHand = (newCards) {
         setState(() {
           showCards = true;
@@ -173,77 +202,204 @@ class _GameScreenState extends State<GameScreen>{
     );
   }
 
-  List<Widget> buildPlay() {
-    return [
-      Container(
-        child: buildCard(
-          text: "____ is not a good way to _____",
-          color: Theme.of(context).primaryColor,
-          textColor: Colors.white
+  void pickWinner(int index) {
+    conn.then((c) {
+      c.sendJson({'message': 'picked_winner', 'winner': submittedCards[index]['id']});
+    });
+  }
+
+  Widget buildCzarCard(BuildContext context, int index) {
+    return Container(
+      width: 200,
+      margin: EdgeInsets.fromLTRB(8, 0, 8, 5),
+      decoration: BoxDecoration(
+        border: Border.all(),
+        borderRadius: BorderRadius.circular(8),
+        //color: Colors.white
+      ),
+      child: InkWell(
+        onTap: 
+          state == GameState.wait_for_czar_pick && currentCzar == userName
+            ? () => pickWinner(index)
+            : null,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          margin: EdgeInsets.all(8 ),
+          decoration: BoxDecoration(
+          ),
+          child: Text(
+            submittedCards[index]['text'],
+            softWrap: true,
+            style: TextStyle(
+              fontWeight: FontWeight.bold
+            ),
+          ),
+        ),
+      )
+    );
+  }
+
+  Widget buildCzarHand() {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.2,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemBuilder: (context, index) {
+          return buildCzarCard(context, index);
+        },
+        itemCount: submittedCards.length,
+      ),
+    );
+  }
+
+  Widget buildHand({bool shade = false}) {
+    final main = Container(
+      height: MediaQuery.of(context).size.height * 0.2,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemBuilder: (context, index) {
+          return buildList(context, index);
+        },
+        itemCount: cards.length,
+      ),
+    );
+    return showCards
+      ? (!shade
+        ? main
+        : Container(
+          decoration: BoxDecoration(
+            color: Colors.black38.withAlpha(128)
+          ),
+          child: main,  
+        ))
+      : CircularProgressIndicator(value: null,);
+  }
+
+  Widget buildCallingCard(String text) {
+    return Container(
+      width: min(MediaQuery.of(context).size.width, 500),
+      height: MediaQuery.of(context).size.height * 0.4,
+      margin: EdgeInsets.fromLTRB(8, 0, 8, 5),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        color: Theme.of(context).primaryColor,
+      ),
+      child: Container(
+        margin: EdgeInsets.all(32),
+        child: Text(
+          text,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 27,
+            fontWeight: FontWeight.bold,
+          )
         ),
       ),
-      Text("The card czar is " + currentCzar),
-      Spacer(),
-      // Show the hand if we have it ready, show circual progress indicator if not
-      showCards ? Container(
-        height: MediaQuery.of(context).size.height * 0.2,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemBuilder: (context, index) {
-            return buildList(context, index);
-          },
-          itemCount: cards.length,
-        ),
-      ) : CircularProgressIndicator(value: null,)
-    ];
+    );
+  }
+
+  Widget buildStatus() {
+    switch(state) {
+      case GameState.submit_cards:
+        if (this.currentCzar == this.userName) {
+          return Text('You are the card czar');
+        } else {
+          return Text('Pick a card');
+        }
+        break;
+      case GameState.wait_for_others_to_submit:
+        return Text('Waiting for everyone else');
+        break;
+      case GameState.wait_for_czar_pick:
+        return Text('The card czar is picking a card');
+        break;
+      case GameState.annoucing_winner:
+        return Text('The winner is ' + winnerUsername);
+        break;
+    }  
+
+    return Container();
   }
 
   @override
   Widget build(BuildContext context) {
     final scoreboard = buildScoreboard();
-    return Scaffold(
-      drawer: Drawer(
-        child: SafeArea(
-          child: Container(
-            child: Column(
+    final hand = buildHand(shade: this.userName == this.currentCzar);
+    final callingCard = buildCallingCard("We can discuss ________ at the stand-up meeting.");
+
+    return WillPopScope(
+      onWillPop: () async { return false; },
+      child: Scaffold(
+        drawer: Drawer(
+          child: SafeArea(
+            child: Container(
+              child: Column(
+                children: <Widget>[
+                  scoreboard,
+                ],
+              ),
+            )
+          )
+        ),
+        body: Center(
+          // SafeArea to nok draw under notch
+          child: SafeArea(
+            child: Flex(
+              direction: Axis.vertical,
               children: <Widget>[
-                scoreboard,
+                Padding(padding: EdgeInsets.only(top: 16)),
+                callingCard,
+                buildStatus(),
+                Spacer(),
+                Divider(),
+                state == GameState.wait_for_czar_pick
+                  ? buildCzarHand()
+                  : hand
               ],
-            ),
+            )
           )
         )
       ),
-      body: Center(
-        // SafeArea to nok draw under notch
-        child: SafeArea(
-          child: Flex(
-            direction: Axis.vertical,
-            children: <Widget>[
-              buildPlay(),
-            ],
-          )
-        )
-      )
     );
+  }
+
+  void submitCard(BuildContext context, int index) {
+    conn.then((c) {
+      c.sendJson({'message': 'submit_card', 'cards': [this.cards[index]['text']]});
+
+      setState(() {
+        state = GameState.wait_for_others_to_submit;
+      });
+    });
   }
 
   // The list of cards to be shown
   Widget buildList(BuildContext context, int index) {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.2,
+      width: 200,
       margin: EdgeInsets.fromLTRB(8, 0, 8, 5),
       decoration: BoxDecoration(
         border: Border.all(),
         borderRadius: BorderRadius.circular(8),
-        color: Colors.white
+        //color: Colors.white
       ),
-      child: RawMaterialButton(
-        onPressed: () {
-          print("buttons!!");
-        },
+      child: InkWell(
+        onTap: 
+          state == GameState.submit_cards && currentCzar != userName
+            ? () => submitCard(context, index)
+            : null,
+        borderRadius: BorderRadius.circular(8),
         child: Container(
-          margin: EdgeInsets.all(2),
-          child: Text(cards[index].values.toList()[0]),
+          margin: EdgeInsets.all(8 ),
+          decoration: BoxDecoration(
+          ),
+          child: Text(
+            cards[index].values.toList()[0],
+            softWrap: true,
+            style: TextStyle(
+              fontWeight: FontWeight.bold
+            ),
+          ),
         ),
       )
     );
