@@ -234,8 +234,9 @@ class _LobbyScreenState extends State<LobbyScreen> {
       };
 
       connection.onKicked = (){
-        setState(() {
-          showDialog(context: context, builder: (context){
+        
+          //Navigator.of(context).pushReplacementNamed('/');
+          showDialog(context: context, barrierDismissible: false, builder: (context){
             return AlertDialog(
               title: Text('Kicked'),
               actions: <Widget>[
@@ -247,7 +248,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
               ],
             );
           });
-        });
+        
       };
 
       connection.onGameCreated = () {
