@@ -255,15 +255,20 @@ class _GameScreenState extends State<GameScreen>{
   }
 
   Widget buildHand({bool shade = false}) {
-    final main = Container(
-      height: MediaQuery.of(context).size.height * 0.2,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemBuilder: (context, index) {
-          return buildList(context, index);
-        },
-        itemCount: cards.length,
-      ),
+    final main = Column(
+      children: <Widget>[
+        Divider(),
+        Container(
+          height: MediaQuery.of(context).size.height * 0.2,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemBuilder: (context, index) {
+              return buildList(context, index);
+            },
+            itemCount: cards.length,
+          ),
+        )
+      ],
     );
     return showCards
       ? (!shade
@@ -353,7 +358,6 @@ class _GameScreenState extends State<GameScreen>{
                 callingCard,
                 buildStatus(),
                 Spacer(),
-                Divider(),
                 state == GameState.wait_for_czar_pick
                   ? buildCzarHand()
                   : hand
