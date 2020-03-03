@@ -18,6 +18,8 @@ class GameScreen extends StatefulWidget {
 class GameScreenState extends State<GameScreen>{
   GameController controller;
   Future<Connection> conn;
+  BuildContext scaffoldContext;
+  final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
   /// Called when the Lobby widget is removed, close any remaining connections.
@@ -31,6 +33,15 @@ class GameScreenState extends State<GameScreen>{
   }
 
   void updateState() {
+    for (String msg in controller.snackMessages) {
+      scaffoldKey.currentState.showSnackBar(SnackBar(
+        content: Text(msg),
+        duration: Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+      ));
+    }
+    controller.snackMessages.clear();
+
     setState(() {});
   }
 
@@ -252,6 +263,7 @@ class GameScreenState extends State<GameScreen>{
     return WillPopScope(
       onWillPop: () async { return false; },
       child: Scaffold(
+        key: scaffoldKey,
         drawer: Drawer(
           child: SafeArea(
             child: Container(

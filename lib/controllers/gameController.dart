@@ -17,8 +17,6 @@ class Player {
 }
 
 class GameController {
-  /// [State] controlled by this class
-  State screen;
   /// Active [Connection] for this controller
   Connection connection;
   /// Current cards
@@ -45,6 +43,8 @@ class GameController {
   bool isHost;
   /// True until we have a received cards for the first time
   bool connecting = true;
+  /// List of snackbar messages to be displayed by the GameScreen
+  List<String> snackMessages = [];
 
   //TODO: Cancel game when there is less than 3 players left
   //TODO: Show snackbar when someone is kicked
@@ -106,6 +106,7 @@ class GameController {
       this.players.removeWhere((p) {
         return p.name == name;
       });
+      snackMessages.add(name + " left the game");
       updateState();
     };
 
