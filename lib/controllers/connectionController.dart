@@ -47,7 +47,7 @@ class Connection {
   /// The callback that is called when a new czard i chosen.
   void Function(String) onNewCzar;
   /// The callback that is called when new scores are set.
-  void Function(Map<String, int>) onNewScores;
+  void Function(Map<String, dynamic>) onNewScores;
   /// The callback is called when the player is promoted to host
   void Function() onPromoted;
   /// The callback is called when all players have submitted cards
@@ -189,8 +189,8 @@ class Connection {
         }
 
         // New scores are set
-        if (json['message'] == 'new_scores' && onNewScores != null) {
-          onNewScores(json['scores'] as Map<String, int>);
+        if (json['message'] == 'new_score' && onNewScores != null) {
+          onNewScores(json['scores']);
         }
 
         if (json['message'] == 'submitted_cards' && onSubmittedCards != null) {

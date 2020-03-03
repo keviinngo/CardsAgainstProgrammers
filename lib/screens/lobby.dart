@@ -463,13 +463,13 @@ class _LobbyScreenState extends State<LobbyScreen> {
   /// Returns a button that sends the json message for starting the game.
   Widget startGame(Future<Connection> conn) {
     return RaisedButton(
-      onPressed: () {
+      onPressed: players.length >= 2 ? () {
         conn.then((connection) {
           connection.sendJson(
             {"message": "start_game"}
           );
         });
-      },
+      } : null,
       child: Text('Start game'),
     );
   }

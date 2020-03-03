@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cap/controllers/connectionController.dart';
 import 'package:flutter/material.dart';
 
+
 enum GameState {
   submit_cards,
   wait_for_others_to_submit,
@@ -22,9 +23,9 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen>{
   /// A list of cards the player has
-  List<dynamic> cards;
+  List<dynamic> cards = [];
   /// A list of submitted cards
-  List<dynamic> submittedCards;
+  List<dynamic> submittedCards = [];
   /// List of players with their name and score
   List<Player> players = List<Player>();
   /// Player's name
@@ -111,8 +112,10 @@ class _GameScreenState extends State<GameScreen>{
       connection.onNewScores = (scores) {
         setState(() {
           players.clear();
+          print(scores);
 
           scores.forEach((player, score) {
+            print(player + " " + score.toString());
             players.add(Player(player, score));
           });
         });
@@ -161,46 +164,6 @@ class _GameScreenState extends State<GameScreen>{
           ),
         ),
       )
-    );
-  }
-
-  Widget buildScoreboard() {
-    var rows = <TableRow>[];
-
-    //TODO: Make it possible for the host to kick users here
-    for (var player in players) {
-      var prefix = "";
-
-      if (isHost && userName == player.name) {
-        prefix += "🔨";
-      }
-      if (currentCzar == player.name) {
-        prefix += "👑";
-      }
-
-      if (prefix != "") {
-        prefix += " ";
-      }
-
-      rows.add(
-        TableRow(
-          children: [
-            Center(child: Text(prefix + player.name)),
-            Center(child: Text(player.score.toString())),
-          ],
-        )
-      );
-    }
-    return Container(
-      child: Column(
-        children: <Widget>[
-          Text("Players"),
-          Divider(),
-          Table(
-            children: rows,
-          )
-        ],
-      ),
     );
   }
 
@@ -328,6 +291,46 @@ class _GameScreenState extends State<GameScreen>{
     return Container();
   }
 
+    Widget buildScoreboard() {
+    var rows = <TableRow>[];
+
+    //TODO: Make it possible for the host to kick users here
+    for (var player in players) {
+      var prefix = "";
+
+      if (isHost && userName == player.name) {
+        prefix += "🔨";
+      }
+      if (currentCzar == player.name) {
+        prefix += "👑";
+      }
+
+      if (prefix != "") {
+        prefix += " ";
+      }
+
+      rows.add(
+        TableRow(
+          children: [
+            Center(child: Text(prefix + player.name)),
+            Center(child: Text(player.score.toString())),
+          ],
+        )
+      );
+    }
+    return Container(
+      child: Column(
+        children: <Widget>[
+          Text("Players"),
+          Divider(),
+          Table(
+            children: rows,
+          )
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final scoreboard = buildScoreboard();
@@ -342,7 +345,7 @@ class _GameScreenState extends State<GameScreen>{
             child: Container(
               child: Column(
                 children: <Widget>[
-                  scoreboard,
+                  scoreboard
                 ],
               ),
             )
