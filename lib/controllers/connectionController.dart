@@ -22,7 +22,6 @@ enum ConnectionState {
 class Connection {
   final WebSocket socket;
   ConnectionState state = ConnectionState.waitingForHello;
-  List<Player> players = List<Player>();
   List<dynamic> cards = List<dynamic>();
   String username;
   String code;
@@ -253,14 +252,4 @@ class Connection {
 
     return completer.future;
   }
-}
-
-/// Player class.
-/// 
-/// Contains the [name] and [score] of a player
-class Player {
-  String name;
-  int score;
-  
-  Player(this.name, this.score);
 }
