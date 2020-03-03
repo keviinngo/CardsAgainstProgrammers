@@ -22,7 +22,6 @@ enum ConnectionState {
 class Connection {
   final WebSocket socket;
   ConnectionState state = ConnectionState.waitingForHello;
-  List<Player> players = List<Player>();
   List<dynamic> cards = List<dynamic>();
   String username;
   String code;
@@ -47,9 +46,13 @@ class Connection {
   /// The callback that is called when a new czard i chosen.
   void Function(String) onNewCzar;
   /// The callback that is called when new scores are set.
-  void Function(Map<String, int>) onNewScores;
+  void Function(Map<String, dynamic>) onNewScores;
   /// The callback is called when the player is promoted to host
   void Function() onPromoted;
+  /// The callback is called when all players have submitted cards
+  void Function(List<dynamic>) onSubmittedCards;
+  /// The callback is called when a winner is picked
+  void Function(String) onWinner;
 
   /// Connection constructor.
   /// 
@@ -83,6 +86,8 @@ class Connection {
       return;
     }
 
+    print(json);
+
     if (json['message'] == 'bye') {
       socket.close();
       return;
@@ -91,6 +96,22 @@ class Connection {
     if (json['message'] == 'code_checked') {
       // Ignore this I guess
       return;
+    }
+
+    //TODO: This can get lost when tranistioning from Lobby to Game
+    // Joined
+    if (json['message'] == 'joined' && onJoin != null) {
+      onJoin(json['username']);
+    }
+
+    // Left
+    if (json['message'] == 'left' && onLeft != null) {
+      onLeft(json['username']);
+    }
+
+    //Kicked
+    if (json['message'] == 'kicked' && onKicked != null) {
+      onKicked();
     }
 
     // Swtich case for each of the possible states of the game.
@@ -140,20 +161,6 @@ class Connection {
         inLobby = true;
         break;
       case ConnectionState.inLobby:
-        // Joined
-        if (json['message'] == 'joined' && onJoin != null) {
-          onJoin(json['username']);
-        }
-
-        // Left
-        if (json['message'] == 'left' && onLeft != null) {
-          onLeft(json['username']);
-        }
-
-        //Kicked
-        if (json['message'] == 'kicked' && onKicked != null) {
-          onKicked();
-        }
         // Game starting
         if (json['message'] == 'game_starting' && onStarted != null) {
           onStarted();
@@ -167,7 +174,7 @@ class Connection {
         // 
         // TODO: Handle this case.
         break;
-        case ConnectionState.inGame:
+      case ConnectionState.inGame:
 
         // Getting a new hand
         if (json['message'] == 'new_hand' && onNewHand != null) {
@@ -181,8 +188,16 @@ class Connection {
         }
 
         // New scores are set
-        if (json['message'] == 'new_scores' && onNewScores != null) {
-          onNewScores(json['scores'] as Map<String, int>);
+        if (json['message'] == 'new_score' && onNewScores != null) {
+          onNewScores(json['scores']);
+        }
+
+        if (json['message'] == 'submitted_cards' && onSubmittedCards != null) {
+          onSubmittedCards(json['cards']);
+        }
+
+        if (json['message'] == 'winner_announce' && onWinner != null) {
+          onWinner(json['winner']);
         }
 
         break;
@@ -237,14 +252,4 @@ class Connection {
 
     return completer.future;
   }
-}
-
-/// Player class.
-/// 
-/// Contains the [name] and [score] of a player
-class Player {
-  String name;
-  int score;
-  
-  Player(this.name, this.score);
 }
