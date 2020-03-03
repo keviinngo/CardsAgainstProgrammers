@@ -28,7 +28,7 @@ class GameController {
   /// Submitted cards
   List<dynamic> submittedCards = [];
   /// Notifies the controlled screen to update
-  void Function() setState;
+  void Function() updateState;
   /// Most recent winner
   String winnerUsername;
   /// All players in the game
@@ -43,14 +43,20 @@ class GameController {
   bool showCards;
   /// True if the local user is host
   bool isHost;
-  /// 
+  /// True until we have a received cards for the first time
   bool connecting = true;
 
-  GameController(this.connection, this.setState, this.userName, this.isHost) {
+  //TODO: Cancel game when there is less than 3 players left
+  //TODO: Show snackbar when someone is kicked
+
+  //TODO: +Server, How do we handle disconnects mid-round?
+  //               Likewise, how do we handle new czar mid-round?
+
+  GameController(this.connection, this.updateState, this.userName, this.isHost) {
     connection.onSubmittedCards = (cards) {
       state = GameState.wait_for_czar_pick;
       submittedCards = cards;
-      setState();
+      updateState();
     };
 
     connection.onWinner = (winner) {
@@ -60,7 +66,7 @@ class GameController {
       Future.delayed(Duration(seconds: 4), () {
         state = GameState.submit_cards;
         showCards = true;
-        setState();
+        updateState();
       });
     };
 
@@ -68,7 +74,7 @@ class GameController {
       showCards = true;
       connecting = false;
       hand = newCards;
-      setState();
+      updateState();
     };
 
     connection.onNewCzar = (czar) {
@@ -79,7 +85,7 @@ class GameController {
       } else {
         isCzar = false;
       }
-      setState();
+      updateState();
     };
 
     connection.onNewScores = (scores) {
@@ -88,19 +94,19 @@ class GameController {
       scores.forEach((player, score) {
         players.add(Player(player, score));
       });
-      setState();
+      updateState();
     };
     
     connection.onJoin = (name) {
       this.players.add(Player(name, 0));
-      setState();
+      updateState();
     };
 
     connection.onLeft = (name) {
       this.players.removeWhere((p) {
         return p.name == name;
       });
-      setState();
+      updateState();
     };
 
     // Sets up all the new methods before sending ready signal
@@ -113,6 +119,6 @@ class GameController {
       connection.sendJson({'message': 'submit_card', 'cards': [hand[index]['text']]});
 
       state = GameState.wait_for_others_to_submit;
-      setState();
+      updateState();
   }
 }
