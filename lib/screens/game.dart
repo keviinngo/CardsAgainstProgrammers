@@ -152,7 +152,9 @@ class GameScreenState extends State<GameScreen>{
           ),
           child: main,  
         ))
-      : CircularProgressIndicator(value: null,);
+      : (controller.connecting
+        ? CircularProgressIndicator(value: null,)
+        : Container());
   }
 
   Widget buildCallingCard(String text) {
@@ -295,7 +297,7 @@ class GameScreenState extends State<GameScreen>{
       child: InkWell(
         onTap: 
           controller.state == GameState.submit_cards && controller.currentCzar != controller.userName
-            ? () => controller.submitCard(context, index)
+            ? () => controller.submitCard(index)
             : null,
         borderRadius: BorderRadius.circular(8),
         child: Container(

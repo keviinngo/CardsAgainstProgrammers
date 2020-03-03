@@ -43,6 +43,8 @@ class GameController {
   bool showCards;
   /// True if the local user is host
   bool isHost;
+  /// 
+  bool connecting = true;
 
   GameController(this.connection, this.setState, this.userName, this.isHost) {
     connection.onSubmittedCards = (cards) {
@@ -52,16 +54,19 @@ class GameController {
     };
 
     connection.onWinner = (winner) {
+      showCards = false;
       state = GameState.annoucing_winner;
       winnerUsername = winner;
       Future.delayed(Duration(seconds: 4), () {
         state = GameState.submit_cards;
+        showCards = true;
         setState();
       });
     };
 
     connection.onNewHand = (newCards) {
       showCards = true;
+      connecting = false;
       hand = newCards;
       setState();
     };
@@ -79,10 +84,8 @@ class GameController {
 
     connection.onNewScores = (scores) {
       players.clear();
-      print(scores);
 
       scores.forEach((player, score) {
-        print(player + " " + score.toString());
         players.add(Player(player, score));
       });
       setState();
@@ -106,7 +109,7 @@ class GameController {
     state = GameState.submit_cards;
   }
 
-  void submitCard(BuildContext context, int index) {
+  void submitCard(int index) {
       connection.sendJson({'message': 'submit_card', 'cards': [hand[index]['text']]});
 
       state = GameState.wait_for_others_to_submit;
