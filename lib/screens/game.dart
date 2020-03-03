@@ -63,31 +63,6 @@ class GameScreenState extends State<GameScreen>{
     });
   }
 
-  Widget buildCard({@required String text, @required Color color, @required Color textColor}) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height * 0.4,
-      margin: EdgeInsets.fromLTRB(8, 0, 8, 5),
-      decoration: BoxDecoration(
-        border: Border.all(),
-        borderRadius: BorderRadius.circular(8),
-        color: color,
-      ),
-      child: RawMaterialButton(
-        onPressed: () {
-          print("buttons!!");
-        },
-        child: Container(
-          margin: EdgeInsets.all(2),
-          child: Text(
-            text,
-            style: TextStyle(color: textColor)
-          ),
-        ),
-      )
-    );
-  }
-
   void pickWinner(int index) {
     conn.then((c) {
       c.sendJson({'message': 'picked_winner', 'winner': controller.submittedCards[index]['id']});
