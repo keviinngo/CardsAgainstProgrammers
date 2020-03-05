@@ -37,8 +37,8 @@ class GameController {
   String userName;
   /// If the local player is czar
   bool isCzar;
-  /// Signigies if cards are loaded
-  bool showCards;
+  /// Signigies if cards are to be shown
+  bool showCards = true;
   /// True if the local user is host
   bool isHost;
   /// True until we have a received cards for the first time
@@ -71,7 +71,6 @@ class GameController {
     };
 
     connection.onNewHand = (newCards) {
-      showCards = true;
       connecting = false;
       hand = newCards;
       updateState();
@@ -117,7 +116,7 @@ class GameController {
   }
 
   void submitCard(int index) {
-      connection.sendJson({'message': 'submit_card', 'cards': [hand[index]['text']]});
+      connection.sendJson({'message': 'submit_card', 'cards': [hand[index]['id']]});
 
       state = GameState.wait_for_others_to_submit;
       updateState();
