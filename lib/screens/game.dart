@@ -233,7 +233,7 @@ class GameScreenState extends State<GameScreen>{
   Widget build(BuildContext context) {
     final scoreboard = buildScoreboard();
     final hand = buildHand(shade: controller.userName == controller.currentCzar);
-    final callingCard = buildCallingCard("We can discuss ________ at the stand-up meeting.");
+    final callingCard = buildCallingCard(controller.callCardText);
 
     return WillPopScope(
       onWillPop: () async { return false; },

@@ -45,6 +45,10 @@ class GameController {
   bool connecting = true;
   /// List of snackbar messages to be displayed by the GameScreen
   List<String> snackMessages = [];
+  /// 
+  String callCardText = "";
+  ///
+  int callCardlBlanks = 0;
 
   //TODO: Cancel game when there is less than 3 players left
   //TODO: Show snackbar when someone is kicked
@@ -93,6 +97,12 @@ class GameController {
       scores.forEach((player, score) {
         players.add(Player(player, score));
       });
+      updateState();
+    };
+
+    connection.onNewCallCard = (text, blanks) {
+      callCardText = text;
+      callCardlBlanks = blanks;
       updateState();
     };
     
