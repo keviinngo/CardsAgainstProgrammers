@@ -45,11 +45,11 @@ class GameController {
   bool connecting = true;
   /// List of snackbar messages to be displayed by the GameScreen
   List<String> snackMessages = [];
-  /// 
+  /// Text for the active callCard
   String callCardText = "";
-  ///
+  /// Number of blanks in the current call card
   int callCardlBlanks = 0;
-  ///
+  /// Number of cards currently submitted, flushed when it reaches cardsToSubmit.length == callCardBlanks.
   List<dynamic> cardsToSubmit = [];
 
   //TODO: Cancel game when there is less than 3 players left

@@ -53,7 +53,7 @@ class Connection {
   void Function(List<dynamic>) onSubmittedCards;
   /// The callback is called when a winner is picked
   void Function(String) onWinner;
-  /// The callback is calledd when a new call card is sent
+  /// The callback is called when a new call card is sent
   void Function(String, int) onNewCallCard;
 
   /// Connection constructor.
