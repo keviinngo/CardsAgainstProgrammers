@@ -49,6 +49,8 @@ class GameController {
   String callCardText = "";
   ///
   int callCardlBlanks = 0;
+  ///
+  List<dynamic> cardsToSubmit = [];
 
   //TODO: Cancel game when there is less than 3 players left
   //TODO: Show snackbar when someone is kicked
@@ -126,9 +128,15 @@ class GameController {
   }
 
   void submitCard(int index) {
-      connection.sendJson({'message': 'submit_card', 'cards': [hand[index]['id']]});
+      cardsToSubmit.add(hand[index]['id']);
 
-      state = GameState.wait_for_others_to_submit;
+      if (cardsToSubmit.length == callCardlBlanks) {
+        connection.sendJson({'message': 'submit_card', 'cards': cardsToSubmit});
+
+        state = GameState.wait_for_others_to_submit;
+        cardsToSubmit.clear();
+      }
+
       updateState();
   }
 }

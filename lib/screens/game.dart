@@ -69,7 +69,7 @@ class GameScreenState extends State<GameScreen>{
     });
   }
 
-  Widget buildCzarCard(BuildContext context, int index) {
+  Widget buildSingleCzarCard(BuildContext context, int index, String text) {
     return Container(
       width: 200,
       margin: EdgeInsets.fromLTRB(8, 0, 8, 5),
@@ -89,7 +89,7 @@ class GameScreenState extends State<GameScreen>{
           decoration: BoxDecoration(
           ),
           child: Text(
-            controller.submittedCards[index]['text'],
+            text,
             softWrap: true,
             style: TextStyle(
               fontWeight: FontWeight.bold
@@ -97,6 +97,25 @@ class GameScreenState extends State<GameScreen>{
           ),
         ),
       )
+    );
+  }
+
+  Widget buildCzarCard(BuildContext context, int index) {
+    List<Widget> cards = [];
+    for (var card in controller.submittedCards[index]['cards']) {
+      cards.add(buildSingleCzarCard(context, index, card));
+    }
+
+    return Container(
+      width: 200,
+      margin: EdgeInsets.fromLTRB(8, 0, 8, 5),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        children: cards,
+      ),
     );
   }
 
@@ -122,7 +141,7 @@ class GameScreenState extends State<GameScreen>{
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemBuilder: (context, index) {
-              return buildList(context, index);
+              return buildCard(context, index);
             },
             itemCount: controller.hand.length,
           ),
@@ -179,7 +198,11 @@ class GameScreenState extends State<GameScreen>{
         return Text('Waiting for everyone else');
         break;
       case GameState.wait_for_czar_pick:
-        return Text('The card czar is picking a card');
+        if (controller.currentCzar == controller.userName) {
+          return Text('Pick the card you like the most');
+        } else {
+          return Text('The card czar is picking a card');
+        }
         break;
       case GameState.annoucing_winner:
         return Text('The winner is ' + controller.winnerUsername);
@@ -272,7 +295,7 @@ class GameScreenState extends State<GameScreen>{
   }
 
   // The list of cards to be shown
-  Widget buildList(BuildContext context, int index) {
+  Widget buildCard(BuildContext context, int index) {
     return Container(
       width: 200,
       margin: EdgeInsets.fromLTRB(8, 0, 8, 5),

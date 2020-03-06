@@ -199,7 +199,7 @@ class Connection {
         }
 
         if (json['message'] == 'submitted_cards' && onSubmittedCards != null) {
-          onSubmittedCards(json['cards']);
+          onSubmittedCards(json['users']);
         }
 
         if (json['message'] == 'winner_announce' && onWinner != null) {
