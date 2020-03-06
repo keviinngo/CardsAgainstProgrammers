@@ -45,6 +45,12 @@ class GameController {
   bool connecting = true;
   /// List of snackbar messages to be displayed by the GameScreen
   List<String> snackMessages = [];
+  /// Text for the active callCard
+  String callCardText = "";
+  /// Number of blanks in the current call card
+  int callCardlBlanks = 0;
+  /// Number of cards currently submitted, flushed when it reaches cardsToSubmit.length == callCardBlanks.
+  List<dynamic> cardsToSubmit = [];
 
   //TODO: Cancel game when there is less than 3 players left
   //TODO: Show snackbar when someone is kicked
@@ -95,6 +101,12 @@ class GameController {
       });
       updateState();
     };
+
+    connection.onNewCallCard = (text, blanks) {
+      callCardText = text;
+      callCardlBlanks = blanks;
+      updateState();
+    };
     
     connection.onJoin = (name) {
       this.players.add(Player(name, 0));
@@ -116,9 +128,15 @@ class GameController {
   }
 
   void submitCard(int index) {
-      connection.sendJson({'message': 'submit_card', 'cards': [hand[index]['id']]});
+      cardsToSubmit.add(hand[index]['id']);
 
-      state = GameState.wait_for_others_to_submit;
+      if (cardsToSubmit.length == callCardlBlanks) {
+        connection.sendJson({'message': 'submit_card', 'cards': cardsToSubmit});
+
+        state = GameState.wait_for_others_to_submit;
+        cardsToSubmit.clear();
+      }
+
       updateState();
   }
 }

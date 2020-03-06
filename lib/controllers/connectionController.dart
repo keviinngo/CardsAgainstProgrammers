@@ -53,6 +53,8 @@ class Connection {
   void Function(List<dynamic>) onSubmittedCards;
   /// The callback is called when a winner is picked
   void Function(String) onWinner;
+  /// The callback is called when a new call card is sent
+  void Function(String, int) onNewCallCard;
 
   /// Connection constructor.
   /// 
@@ -187,13 +189,17 @@ class Connection {
           onNewCzar(json['username']);
         }
 
+        if (json['message'] == 'new_call' && onNewCallCard != null) {
+          onNewCallCard(json['text'], json['blanks']);
+        }
+
         // New scores are set
         if (json['message'] == 'new_score' && onNewScores != null) {
           onNewScores(json['scores']);
         }
 
         if (json['message'] == 'submitted_cards' && onSubmittedCards != null) {
-          onSubmittedCards(json['cards']);
+          onSubmittedCards(json['users']);
         }
 
         if (json['message'] == 'winner_announce' && onWinner != null) {
