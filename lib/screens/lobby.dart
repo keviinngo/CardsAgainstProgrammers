@@ -275,7 +275,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
           'players': players,
           'isHost': isHost,
           'userName': userName,
-          'conn': conn,
+          'conn': connection,
         });
       };
       connection.onPromoted = () {
