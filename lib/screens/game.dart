@@ -17,7 +17,7 @@ class GameScreen extends StatefulWidget {
 
 class GameScreenState extends State<GameScreen>{
   GameController controller;
-  Future<Connection> conn;
+  Connection connection;
   BuildContext scaffoldContext;
   final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
 
@@ -25,11 +25,9 @@ class GameScreenState extends State<GameScreen>{
   /// Called when the Lobby widget is removed, close any remaining connections.
   void dispose() {
     super.dispose();
- 
-    conn.then((connection) {
-      connection.sendJson({'message': 'leave_game'});
-      connection.socket.close();
-    });
+
+    connection.sendJson({'message': 'leave_game'});
+    connection.socket.close();
   }
 
   void updateState() {
@@ -52,21 +50,17 @@ class GameScreenState extends State<GameScreen>{
     // Gets necessary data from previous screen
     String userName = widget.arguments['userName'];
     bool isHost = widget.arguments['isHost'];
-    conn = widget.arguments['conn'];
+    connection = widget.arguments['conn'];
     List<Player> players = [];
     for (String playerName in widget.arguments['players']) {
       players.add(Player(playerName, 0));
     }
 
-    conn.then((connection) {
-      controller = GameController(connection, updateState, userName, isHost, );
-    });
+    controller = GameController(connection, updateState, userName, isHost, );
   }
 
   void pickWinner(int index) {
-    conn.then((c) {
-      c.sendJson({'message': 'picked_winner', 'winner': controller.submittedCards[index]['id']});
-    });
+    connection.sendJson({'message': 'picked_winner', 'winner': controller.submittedCards[index]['id']});
   }
 
   Widget buildSingleCzarCard(BuildContext context, int index, String text) {
@@ -239,6 +233,7 @@ class GameScreenState extends State<GameScreen>{
         )
       );
     }
+    
     return Container(
       child: Column(
         children: <Widget>[
