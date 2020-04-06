@@ -1,12 +1,67 @@
 import 'package:cap/controllers/connectionController.dart';
+import 'package:cap/util/cards.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 /// Lobby settings.
 class LobbySettings {
-  int scoreToWin = 5;
-  bool check = false;
+  int  scoreToWin = 5;
+  bool check      = false;
+  int  activeDeck = 0;
 }
+
+
+List<Widget> buildDeckSelection(BuildContext context, Future<List<Deck>> allDecks) {
+  return [
+    FutureBuilder<List<Deck>>(
+      future: allDecks.timeout(Duration(seconds: 10)),
+      builder: (context, snapshot) {
+        List<Widget> children = [];
+
+        if (snapshot.hasData) {
+          if (snapshot.data == null) {
+            children.add(Text("Failed to load decks. Try again later."));
+            return Column(children: children);
+          }
+
+          for (var deck in snapshot.data) {
+            children.add(ListTile(
+              title: Text(
+                  deck.title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 20,
+                  ),
+                ),
+                subtitle: Text(deck.description),
+                onTap: () {
+                  print("We want: " + deck.title);
+                },
+            ));
+          }
+        } else if (snapshot.hasError) {
+          children.add(Text("Failed to load decks. Try again later."));
+          return Column(children: children);
+        } else {
+          children.add(CircularProgressIndicator());
+          return Column(children: children);
+        }
+
+        return ListView.separated(
+          shrinkWrap: true,
+          itemCount: children.length,
+          itemBuilder: (context, index) {
+            return children[index];
+          },
+          separatorBuilder: (context, index) {
+            return Divider();
+          },
+        );
+      }
+    )
+  ];
+}
+
 
 /// Dialog item for [LobbySettingsDialog].
 class SettingsDialogItem extends StatelessWidget {
@@ -111,6 +166,22 @@ class LobbySettingsDialogState extends State<LobbySettingsDialog> {
                           },
                         ),
                       ),
+                      SettingsDialogItem(
+                        left: Text('Select deck'),
+                        right: RaisedButton(
+                          child: Text('Deck'),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return SimpleDialog(
+                                  children: buildDeckSelection(context, getAllDecks()),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      )
                     ],
                   )
                 ),
