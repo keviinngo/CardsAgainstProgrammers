@@ -11,44 +11,45 @@ class LobbySettings {
 }
 
 
-List<Widget> buildDeckSelection(BuildContext context, Future<List<Deck>> allDecks) {
-  return [
-    FutureBuilder<List<Deck>>(
-      future: allDecks.timeout(Duration(seconds: 10)),
-      builder: (context, snapshot) {
-        List<Widget> children = [];
+Widget buildDeckSelection(BuildContext context, Future<List<Deck>> allDecks) {
+  return FutureBuilder<List<Deck>>(
+    future: allDecks.timeout(Duration(seconds: 10)),
+    builder: (context, snapshot) {
+      List<Widget> children = [];
 
-        if (snapshot.hasData) {
-          if (snapshot.data == null) {
-            children.add(Text("Failed to load decks. Try again later."));
-            return Column(children: children);
-          }
-
-          for (var deck in snapshot.data) {
-            children.add(ListTile(
-              title: Text(
-                  deck.title,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 20,
-                  ),
-                ),
-                subtitle: Text(deck.description),
-                onTap: () {
-                  print("We want: " + deck.title);
-                },
-            ));
-          }
-        } else if (snapshot.hasError) {
+      if (snapshot.hasData) {
+        if (snapshot.data == null) {
           children.add(Text("Failed to load decks. Try again later."));
-          return Column(children: children);
-        } else {
-          children.add(CircularProgressIndicator());
           return Column(children: children);
         }
 
-        return ListView.separated(
-          shrinkWrap: true,
+        for (var deck in snapshot.data) {
+          children.add(ListTile(
+            title: Text(
+                deck.title,
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 20,
+                ),
+              ),
+              subtitle: Text(deck.description),
+              onTap: () {
+                print("We want: " + deck.title);
+                //TODO: Do something with the thing we return
+                Navigator.of(context).pop(deck.id);
+              },
+          ));
+        }
+      } else if (snapshot.hasError) {
+        children.add(Text("Failed to load decks. Try again later."));
+        return Column(children: children);
+      } else {
+        children.add(CircularProgressIndicator());
+        return Column(children: children);
+      }
+
+      return Container(
+        child: ListView.separated(
           itemCount: children.length,
           itemBuilder: (context, index) {
             return children[index];
@@ -56,10 +57,10 @@ List<Widget> buildDeckSelection(BuildContext context, Future<List<Deck>> allDeck
           separatorBuilder: (context, index) {
             return Divider();
           },
-        );
-      }
-    )
-  ];
+        ),
+      );
+    }
+  );
 }
 
 
@@ -171,14 +172,21 @@ class LobbySettingsDialogState extends State<LobbySettingsDialog> {
                         right: RaisedButton(
                           child: Text('Deck'),
                           onPressed: () {
-                            showDialog(
+                            var deck = showDialog(
                               context: context,
                               builder: (context) {
-                                return SimpleDialog(
-                                  children: buildDeckSelection(context, getAllDecks()),
+                                return AlertDialog(
+                                  title: Text("Select a deck"),
+                                  content: buildDeckSelection(context, getAllDecks()),
                                 );
                               },
                             );
+
+                            deck.then((deckid) {
+                              if (deckid.runtimeType == int) {
+                                settings.activeDeck = deckid;
+                              }
+                            });
                           },
                         ),
                       )
@@ -537,6 +545,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
     return RaisedButton(
       onPressed: players.length >= 2 ? () {
         conn.then((connection) {
+          //TODO: send the deck we want to use
           connection.sendJson(
             {"message": "start_game"}
           );
