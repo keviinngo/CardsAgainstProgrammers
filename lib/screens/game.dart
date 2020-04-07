@@ -43,6 +43,10 @@ class GameScreenState extends State<GameScreen>{
     setState(() {});
   }
 
+  void exitGame() {
+    Navigator.of(context).pushReplacementNamed('/');
+  }
+
   @override
   void initState() {
     super.initState();
@@ -262,7 +266,14 @@ class GameScreenState extends State<GameScreen>{
             child: Container(
               child: Column(
                 children: <Widget>[
-                  scoreboard
+                  scoreboard,
+                  Spacer(),
+                  RaisedButton( //TODO: maybe have dialog box 
+                    child: Text("Leave game", textAlign: TextAlign.center,),
+                    onPressed: () {exitGame();},
+                    color: Colors.amber,
+                  ),
+                  Padding(padding: EdgeInsets.only(bottom: 20),)
                 ],
               ),
             )
