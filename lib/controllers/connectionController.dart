@@ -217,45 +217,52 @@ class Connection {
 
   /// Creates a game and returns the new [Connection]
   static Future<Connection> createGame(String username) async {
-    var socket = await WebSocket.connect("$SERVER_PROTOCOL$SERVER_ADDRESS:$SERVER_PORT$SERVER_PATH");
-
-
-    return Connection(socket, true, username);
+    try {
+      var socket = await WebSocket.connect("$SERVER_PROTOCOL$SERVER_ADDRESS:$SERVER_PORT$SERVER_PATH").timeout(Duration(seconds: 10));
+      return Connection(socket, true, username);
+    } catch(e) {
+      return null;
+    }
   }
 
   /// Joings a game and returns the new [Connection]
   static Future<Connection> joinGame(String username, String code) async {
-    var socket = await WebSocket.connect("$SERVER_PROTOCOL$SERVER_ADDRESS:$SERVER_PORT$SERVER_PATH");
-
-
-    return Connection(socket, false, username, code: code);
+    try {
+      var socket = await WebSocket.connect("$SERVER_PROTOCOL$SERVER_ADDRESS:$SERVER_PORT$SERVER_PATH").timeout(Duration(seconds: 10));
+      return Connection(socket, false, username, code: code);
+    } catch(e) {
+      return null;
+    }
   }
 
   /// Checks if a code is valid. If it is the [Future<Connection>] yields a [Connection], otherwise it yields null
   static Future<Connection> checkCodeAndJoinGame(String username, String code) async {
-    var socket = await WebSocket.connect("$SERVER_PROTOCOL$SERVER_ADDRESS:$SERVER_PORT$SERVER_PATH");
+    try {
+      var socket = await WebSocket.connect("$SERVER_PROTOCOL$SERVER_ADDRESS:$SERVER_PORT$SERVER_PATH").timeout(Duration(seconds: 10));
+      var completer = Completer<Connection>();
 
-    var completer = Completer<Connection>();
+      socket.listen((data) async {
+        var json = jsonDecode(data);
+        print(json);
 
-    socket.listen((data) async {
-      var json = jsonDecode(data);
-      print(json);
-
-      if (json['message'] == 'code_checked') {
-        if (json['is_valid']) {
-          completer.complete(joinGame(username, code));
-        } else {
+        if (json['message'] == 'code_checked') {
+          if (json['is_valid']) {
+            completer.complete(joinGame(username, code));
+          } else {
+            completer.complete(null);
+          }
+          socket.close();
+        }
+      }, onDone: () {
+        if (!completer.isCompleted) {
           completer.complete(null);
         }
-        socket.close();
-      }
-    }, onDone: () {
-      if (!completer.isCompleted) {
-        completer.complete(null);
-      }
-    });
-    socket.addUtf8Text(utf8.encode('{"message":"code_is_valid","code":"$code"}'));
+      });
+      socket.addUtf8Text(utf8.encode('{"message":"code_is_valid","code":"$code"}'));
 
-    return completer.future;
+      return completer.future;
+    } catch(e) {
+      return null;
+    }
   }
 }

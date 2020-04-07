@@ -323,7 +323,27 @@ class _LobbyScreenState extends State<LobbyScreen> {
     userName = widget.arguments['username'];
     conn = widget.arguments['connection'];
     conn.then((connection) {
-      isHost = connection.isHost;
+      // Checks if there is an connection, else return home.
+      if (connection != null) {
+        isHost = connection.isHost;
+      } else {
+        Navigator.of(context).pop();
+
+        showDialog(context: context, builder:  (context) {
+          return AlertDialog(
+            title: Text("Failed to connect to server"),
+            content: Text("Check your internet connection"),
+            actions: <Widget>[
+              RaisedButton(
+                child: Text("Ok"),
+                onPressed: () {
+                    Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        });
+      }
 
       // connection.codeIsValidFuture.future.then((val) {
       //   if(!val) {
