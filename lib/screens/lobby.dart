@@ -6,61 +6,7 @@ import 'package:flutter/services.dart';
 /// Lobby settings.
 class LobbySettings {
   int  scoreToWin = 5;
-  bool check      = false;
   int  activeDeck = 0;
-}
-
-
-Widget buildDeckSelection(BuildContext context, Future<List<Deck>> allDecks) {
-  return FutureBuilder<List<Deck>>(
-    future: allDecks.timeout(Duration(seconds: 10)),
-    builder: (context, snapshot) {
-      List<Widget> children = [];
-
-      if (snapshot.hasData) {
-        if (snapshot.data == null) {
-          children.add(Text("Failed to load decks. Try again later."));
-          return Column(children: children);
-        }
-
-        for (var deck in snapshot.data) {
-          children.add(ListTile(
-            title: Text(
-                deck.title,
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 20,
-                ),
-              ),
-              subtitle: Text(deck.description),
-              onTap: () {
-                print("We want: " + deck.title);
-                //TODO: Do something with the thing we return
-                Navigator.of(context).pop(deck.id);
-              },
-          ));
-        }
-      } else if (snapshot.hasError) {
-        children.add(Text("Failed to load decks. Try again later."));
-        return Column(children: children);
-      } else {
-        children.add(CircularProgressIndicator());
-        return Column(children: children);
-      }
-
-      return Container(
-        child: ListView.separated(
-          itemCount: children.length,
-          itemBuilder: (context, index) {
-            return children[index];
-          },
-          separatorBuilder: (context, index) {
-            return Divider();
-          },
-        ),
-      );
-    }
-  );
 }
 
 
@@ -86,6 +32,107 @@ class SettingsDialogItem extends StatelessWidget {
   }
 }
 
+
+class DeckSelectionDialog extends StatefulWidget {
+  final TextEditingController searchTextController;
+
+  DeckSelectionDialog(this.searchTextController);
+
+  @override
+  State<DeckSelectionDialog> createState() => DeckSelectionDialogState();
+}
+
+
+class DeckSelectionDialogState extends State<DeckSelectionDialog> {
+  Future<List<Deck>> allDecks;
+
+  @override
+  void initState() {
+    super.initState();
+
+    allDecks = getAllDecks();
+
+    widget.searchTextController.addListener(this.searchTextChanged);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    widget.searchTextController.removeListener(this.searchTextChanged);
+  }
+
+  void searchTextChanged() {
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<Deck>>(
+      future: allDecks.timeout(Duration(seconds: 10)),
+      builder: (context, snapshot) {
+        List<Widget> children = [];
+
+        if (snapshot.hasData) {
+          if (snapshot.data == null) {
+            children.add(Text("Failed to load decks. Try again later."));
+            return Column(children: children);
+          }
+
+          for (var deck in snapshot.data) {
+            if (deck.title.toLowerCase().contains(widget.searchTextController.text.toLowerCase())) {
+              children.add(ListTile(
+                title: Text(
+                    deck.title,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 20,
+                    ),
+                  ),
+                  subtitle: Text(deck.description),
+                  onTap: () {
+                    print("We want: " + deck.title);
+                    //TODO: Do something with the thing we return
+                    Navigator.of(context).pop(deck.id);
+                  },
+              ));
+            }
+          }
+
+          return Container(
+            child: FractionallySizedBox(
+              heightFactor: 0.8,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      itemCount: children.length,
+                      itemBuilder: (context, index) {
+                        return children[index];
+                      },
+                      separatorBuilder: (context, index) {
+                        return Divider();
+                      },
+                    ),
+                  ),
+                ],
+              )
+            )
+          );
+
+        } else if (snapshot.hasError) {
+          children.add(Text("Failed to load decks. Try again later."));
+          return Column(children: children);
+        } else {
+          children.add(CircularProgressIndicator());
+          return Column(children: children);
+        }
+      }
+    );
+  }
+}
+
+
 /// Dialog for editing lobby settings.
 class LobbySettingsDialog extends StatefulWidget {
   final LobbySettings settings;
@@ -99,16 +146,18 @@ class LobbySettingsDialog extends StatefulWidget {
 
 class LobbySettingsDialogState extends State<LobbySettingsDialog> {
   final TextEditingController scoreToWinController = TextEditingController();
+  final TextEditingController searchTextController = TextEditingController();
 
-  bool check;
   LobbySettings settings;
+  DeckSelectionDialog deckSelectionDialog;
 
   void initState() {
     super.initState();
     
+    this.deckSelectionDialog = DeckSelectionDialog(searchTextController);
     this.settings = widget.settings;
-    check = false;
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -152,32 +201,33 @@ class LobbySettingsDialogState extends State<LobbySettingsDialog> {
                         )
                       ),
                       SettingsDialogItem(
-                        left: Text('Pick a new host'),
-                        right: RaisedButton(
-                          child: Text('Pick'),
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return SimpleDialog(
-                                  children: <Widget>[Text('Hello')],
-                                );
-                              },
-                            );
-                          },
-                        ),
-                      ),
-                      SettingsDialogItem(
                         left: Text('Select deck'),
                         right: RaisedButton(
                           child: Text('Deck'),
                           onPressed: () {
+                            print("Deck pressed!");
                             var deck = showDialog(
                               context: context,
                               builder: (context) {
                                 return AlertDialog(
-                                  title: Text("Select a deck"),
-                                  content: buildDeckSelection(context, getAllDecks()),
+                                  title: Column(
+                                    children: [
+                                      Text("Select a deck"),
+                                      Divider(),
+                                      TextField(
+                                        enabled: true,
+                                        controller: searchTextController,
+                                        onEditingComplete: () {
+                                          FocusScope.of(context).unfocus();
+                                        },
+                                        decoration: InputDecoration(
+                                          hintText: "Search for a deck",
+                                        ),
+                                      ),
+                                    ]
+                                  ),
+                                  //content: buildDeckSelection(context, getAllDecks()),
+                                  content: deckSelectionDialog,
                                 );
                               },
                             );
