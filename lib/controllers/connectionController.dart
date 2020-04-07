@@ -218,7 +218,7 @@ class Connection {
   /// Creates a game and returns the new [Connection]
   static Future<Connection> createGame(String username) async {
     try {
-      var socket = await WebSocket.connect("$SERVER_PROTOCOL$SERVER_ADDRESS:$SERVER_PORT$SERVER_PATH").timeout(Duration(seconds: 10), );
+      var socket = await WebSocket.connect("$SERVER_PROTOCOL$SERVER_ADDRESS:$SERVER_PORT$SERVER_PATH").timeout(Duration(seconds: 10));
       return Connection(socket, true, username);
     } catch(e) {
       return null;
@@ -228,7 +228,7 @@ class Connection {
   /// Joings a game and returns the new [Connection]
   static Future<Connection> joinGame(String username, String code) async {
     try {
-      var socket = await WebSocket.connect("$SERVER_PROTOCOL$SERVER_ADDRESS:$SERVER_PORT$SERVER_PATH");
+      var socket = await WebSocket.connect("$SERVER_PROTOCOL$SERVER_ADDRESS:$SERVER_PORT$SERVER_PATH").timeout(Duration(seconds: 10));
       return Connection(socket, false, username, code: code);
     } catch(e) {
       return null;
@@ -238,7 +238,7 @@ class Connection {
   /// Checks if a code is valid. If it is the [Future<Connection>] yields a [Connection], otherwise it yields null
   static Future<Connection> checkCodeAndJoinGame(String username, String code) async {
     try {
-      var socket = await WebSocket.connect("$SERVER_PROTOCOL$SERVER_ADDRESS:$SERVER_PORT$SERVER_PATH");
+      var socket = await WebSocket.connect("$SERVER_PROTOCOL$SERVER_ADDRESS:$SERVER_PORT$SERVER_PATH").timeout(Duration(seconds: 10));
       var completer = Completer<Connection>();
 
       socket.listen((data) async {
