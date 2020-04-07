@@ -67,67 +67,64 @@ class DeckSelectionDialogState extends State<DeckSelectionDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Deck>>(
-      future: allDecks.timeout(Duration(seconds: 10)),
-      builder: (context, snapshot) {
-        List<Widget> children = [];
+    return Container(
+      child: FractionallySizedBox(
+        heightFactor: 0.7,
+        child: FutureBuilder<List<Deck>>(
+          future: allDecks.timeout(Duration(seconds: 10)),
+          builder: (context, snapshot) {
+            List<Widget> children = [];
 
-        if (snapshot.hasData) {
-          if (snapshot.data == null) {
-            children.add(Text("Failed to load decks. Try again later."));
-            return Column(children: children);
-          }
+            if (snapshot.hasData) {
+              if (snapshot.data == null) {
+                children.add(Text("Failed to load decks. Try again later."));
+                return Column(children: children);
+              }
 
-          for (var deck in snapshot.data) {
-            if (deck.title.toLowerCase().contains(widget.searchTextController.text.toLowerCase())) {
-              children.add(ListTile(
-                title: Text(
-                    deck.title,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 20,
-                    ),
-                  ),
-                  subtitle: Text(deck.description),
-                  onTap: () {
-                    print("We want: " + deck.title);
-                    //TODO: Do something with the thing we return
-                    Navigator.of(context).pop(deck.id);
+              for (var deck in snapshot.data) {
+                if (deck.title.toLowerCase().contains(widget.searchTextController.text.toLowerCase())) {
+                  children.add(ListTile(
+                    title: Text(
+                        deck.title,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 20,
+                        ),
+                      ),
+                      subtitle: Text(deck.description),
+                      onTap: () {
+                        print("We want: " + deck.title);
+                        //TODO: Do something with the thing we return
+                        Navigator.of(context).pop(deck.id);
+                      },
+                  ));
+                }
+              }
+
+              return Container(
+                width: double.maxFinite,
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: children.length,
+                  itemBuilder: (context, index) {
+                    return children[index];
                   },
-              ));
+                  separatorBuilder: (context, index) {
+                    return Divider();
+                  },
+                ),
+              );
+
+            } else if (snapshot.hasError) {
+              children.add(Text("Failed to load decks. Try again later."));
+              return Column(children: children);
+            } else {
+              children.add(CircularProgressIndicator());
+              return Column(children: children);
             }
           }
-
-          return Container(
-            child: FractionallySizedBox(
-              heightFactor: 0.8,
-              child: Column(
-                children: [
-                  Expanded(
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      itemCount: children.length,
-                      itemBuilder: (context, index) {
-                        return children[index];
-                      },
-                      separatorBuilder: (context, index) {
-                        return Divider();
-                      },
-                    ),
-                  ),
-                ],
-              )
-            )
-          );
-
-        } else if (snapshot.hasError) {
-          children.add(Text("Failed to load decks. Try again later."));
-          return Column(children: children);
-        } else {
-          children.add(CircularProgressIndicator());
-          return Column(children: children);
-        }
-      }
+        )
+      )
     );
   }
 }
