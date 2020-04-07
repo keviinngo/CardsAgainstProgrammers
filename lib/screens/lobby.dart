@@ -32,7 +32,7 @@ class SettingsDialogItem extends StatelessWidget {
   }
 }
 
-
+/// Dialog that list all available decks and allows the user to search and pick one
 class DeckSelectionDialog extends StatefulWidget {
   final TextEditingController searchTextController;
 
@@ -42,7 +42,7 @@ class DeckSelectionDialog extends StatefulWidget {
   State<DeckSelectionDialog> createState() => DeckSelectionDialogState();
 }
 
-
+/// See [DeckSelectionDialog]
 class DeckSelectionDialogState extends State<DeckSelectionDialog> {
   Future<List<Deck>> allDecks;
 
@@ -61,6 +61,7 @@ class DeckSelectionDialogState extends State<DeckSelectionDialog> {
     widget.searchTextController.removeListener(this.searchTextChanged);
   }
 
+  /// Event handler used to update list on search text changes
   void searchTextChanged() {
     setState(() {});
   }
@@ -141,6 +142,7 @@ class LobbySettingsDialog extends StatefulWidget {
 }
 
 
+/// See [LobbySettingsDialog]
 class LobbySettingsDialogState extends State<LobbySettingsDialog> {
   final TextEditingController scoreToWinController = TextEditingController();
   final TextEditingController searchTextController = TextEditingController();
@@ -236,7 +238,7 @@ class LobbySettingsDialogState extends State<LobbySettingsDialog> {
                             });
                           },
                         ),
-                      )
+                      ),
                     ],
                   )
                 ),
@@ -263,6 +265,8 @@ class LobbySettingsDialogState extends State<LobbySettingsDialog> {
   }
 }
 
+
+/// Lobby screen where uses can join and the host can start the game.
 class LobbyScreen extends StatefulWidget {
   final Map<String, dynamic> arguments;
 
@@ -275,6 +279,7 @@ class LobbyScreen extends StatefulWidget {
 }
 
 
+/// See [LobbyScreen]
 class _LobbyScreenState extends State<LobbyScreen> {
   final TextEditingController nameController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -412,7 +417,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
     });
   }
 
-  // 
+  /// Confirms a kick action
   Future<bool> confirmKick(BuildContext context, String player) async {
     // Show snackbar if the player kicked is yourself.
     if (player == userName) {
@@ -453,7 +458,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
     );
   }
 
-  // Individual item in the [buildPlayerList] [ListView]
+  /// Individual item in the [buildPlayerList] [ListView]
   Widget buildItem(BuildContext context, String player, bool removed, Animation<double> animation) {
     // Swipable tile for each player.
     // TODO: not have dismissable for joining users.
@@ -500,8 +505,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
     );
   }
 
-  /// [ListView] of players in the lobby.
   //TODO: Show an indication for users themselves
+  /// [ListView] of players in the lobby.
   Widget buildPlayerList() {
     return ClipRect(child: Container(
       decoration: BoxDecoration(
