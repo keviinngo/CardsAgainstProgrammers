@@ -77,7 +77,7 @@ class JoinScreen extends StatelessWidget {
               });
             } else {
               scaffoldKey.currentState.showSnackBar(SnackBar(
-                content: Text('No active game with code ${codeController.text}'),
+                content: Text('Could not connect to lobby'),
                 duration: Duration(seconds: 4),
                 behavior: SnackBarBehavior.floating,
               ));
