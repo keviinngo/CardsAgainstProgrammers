@@ -1,12 +1,14 @@
 import 'package:cap/controllers/connectionController.dart';
+import 'package:cap/util/cards.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 /// Lobby settings.
 class LobbySettings {
-  int scoreToWin = 5;
-  bool check = false;
+  int  scoreToWin = 5;
+  int  activeDeck = 0;
 }
+
 
 /// Dialog item for [LobbySettingsDialog].
 class SettingsDialogItem extends StatelessWidget {
@@ -30,6 +32,105 @@ class SettingsDialogItem extends StatelessWidget {
   }
 }
 
+/// Dialog that list all available decks and allows the user to search and pick one
+class DeckSelectionDialog extends StatefulWidget {
+  final TextEditingController searchTextController;
+
+  DeckSelectionDialog(this.searchTextController);
+
+  @override
+  State<DeckSelectionDialog> createState() => DeckSelectionDialogState();
+}
+
+/// See [DeckSelectionDialog]
+class DeckSelectionDialogState extends State<DeckSelectionDialog> {
+  Future<List<Deck>> allDecks;
+
+  @override
+  void initState() {
+    super.initState();
+
+    allDecks = getAllDecks();
+
+    widget.searchTextController.addListener(this.searchTextChanged);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    widget.searchTextController.removeListener(this.searchTextChanged);
+  }
+
+  /// Event handler used to update list on search text changes
+  void searchTextChanged() {
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: FractionallySizedBox(
+        heightFactor: 0.7,
+        child: FutureBuilder<List<Deck>>(
+          future: allDecks.timeout(Duration(seconds: 10)),
+          builder: (context, snapshot) {
+            List<Widget> children = [];
+
+            if (snapshot.hasData) {
+              if (snapshot.data == null) {
+                children.add(Text("Failed to load decks. Try again later."));
+                return Column(children: children);
+              }
+
+              for (var deck in snapshot.data) {
+                if (deck.title.toLowerCase().contains(widget.searchTextController.text.toLowerCase())) {
+                  children.add(ListTile(
+                    title: Text(
+                        deck.title,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 20,
+                        ),
+                      ),
+                      subtitle: Text(deck.description),
+                      onTap: () {
+                        print("We want: " + deck.title);
+                        //TODO: Do something with the thing we return
+                        Navigator.of(context).pop(deck.id);
+                      },
+                  ));
+                }
+              }
+
+              return Container(
+                width: double.maxFinite,
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: children.length,
+                  itemBuilder: (context, index) {
+                    return children[index];
+                  },
+                  separatorBuilder: (context, index) {
+                    return Divider();
+                  },
+                ),
+              );
+
+            } else if (snapshot.hasError) {
+              children.add(Text("Failed to load decks. Try again later."));
+              return Column(children: children);
+            } else {
+              children.add(CircularProgressIndicator());
+              return Column(children: children);
+            }
+          }
+        )
+      )
+    );
+  }
+}
+
+
 /// Dialog for editing lobby settings.
 class LobbySettingsDialog extends StatefulWidget {
   final LobbySettings settings;
@@ -41,18 +142,21 @@ class LobbySettingsDialog extends StatefulWidget {
 }
 
 
+/// See [LobbySettingsDialog]
 class LobbySettingsDialogState extends State<LobbySettingsDialog> {
   final TextEditingController scoreToWinController = TextEditingController();
+  final TextEditingController searchTextController = TextEditingController();
 
-  bool check;
   LobbySettings settings;
+  DeckSelectionDialog deckSelectionDialog;
 
   void initState() {
     super.initState();
     
+    this.deckSelectionDialog = DeckSelectionDialog(searchTextController);
     this.settings = widget.settings;
-    check = false;
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -96,18 +200,42 @@ class LobbySettingsDialogState extends State<LobbySettingsDialog> {
                         )
                       ),
                       SettingsDialogItem(
-                        left: Text('Pick a new host'),
+                        left: Text('Select deck'),
                         right: RaisedButton(
-                          child: Text('Pick'),
+                          child: Text('Deck'),
                           onPressed: () {
-                            showDialog(
+                            print("Deck pressed!");
+                            var deck = showDialog(
                               context: context,
                               builder: (context) {
-                                return SimpleDialog(
-                                  children: <Widget>[Text('Hello')],
+                                return AlertDialog(
+                                  title: Column(
+                                    children: [
+                                      Text("Select a deck"),
+                                      Divider(),
+                                      TextField(
+                                        enabled: true,
+                                        controller: searchTextController,
+                                        onEditingComplete: () {
+                                          FocusScope.of(context).unfocus();
+                                        },
+                                        decoration: InputDecoration(
+                                          hintText: "Search for a deck",
+                                        ),
+                                      ),
+                                    ]
+                                  ),
+                                  //content: buildDeckSelection(context, getAllDecks()),
+                                  content: deckSelectionDialog,
                                 );
                               },
                             );
+
+                            deck.then((deckid) {
+                              if (deckid.runtimeType == int) {
+                                settings.activeDeck = deckid;
+                              }
+                            });
                           },
                         ),
                       ),
@@ -137,6 +265,8 @@ class LobbySettingsDialogState extends State<LobbySettingsDialog> {
   }
 }
 
+
+/// Lobby screen where uses can join and the host can start the game.
 class LobbyScreen extends StatefulWidget {
   final Map<String, dynamic> arguments;
 
@@ -149,6 +279,7 @@ class LobbyScreen extends StatefulWidget {
 }
 
 
+/// See [LobbyScreen]
 class _LobbyScreenState extends State<LobbyScreen> {
   final TextEditingController nameController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -306,7 +437,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
     });
   }
 
-  // 
+  /// Confirms a kick action
   Future<bool> confirmKick(BuildContext context, String player) async {
     // Show snackbar if the player kicked is yourself.
     if (player == userName) {
@@ -347,7 +478,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
     );
   }
 
-  // Individual item in the [buildPlayerList] [ListView]
+  /// Individual item in the [buildPlayerList] [ListView]
   Widget buildItem(BuildContext context, String player, bool removed, Animation<double> animation) {
     // Swipable tile for each player.
     // TODO: not have dismissable for joining users.
@@ -394,8 +525,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
     );
   }
 
-  /// [ListView] of players in the lobby.
   //TODO: Show an indication for users themselves
+  /// [ListView] of players in the lobby.
   Widget buildPlayerList() {
     return ClipRect(child: Container(
       decoration: BoxDecoration(
@@ -486,6 +617,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
     return RaisedButton(
       onPressed: players.length >= 2 ? () {
         conn.then((connection) {
+          //TODO: send the deck we want to use
           connection.sendJson(
             {"message": "start_game"}
           );

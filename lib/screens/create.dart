@@ -7,12 +7,17 @@ class CreateScreen extends StatelessWidget {
   final TextEditingController nameController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  Widget buildNameField() {
+  Widget buildNameField(BuildContext context) {
     return TextFormField(
       controller: nameController,
       maxLength: 20,
       maxLengthEnforced: true,
       textAlign: TextAlign.center,
+      onEditingComplete: () {
+        // Dismisses keyboard
+        FocusScope.of(context).unfocus();
+        createGame(context);
+      },
       decoration: InputDecoration(
         hintText: '----',
         border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
@@ -29,16 +34,7 @@ class CreateScreen extends StatelessWidget {
     return InkWell(
       borderRadius: BorderRadius.all(Radius.circular(10)),
       onTap: (() {
-        if (formKey.currentState.validate()) {
-          Future<Connection> conn = Connection.createGame('${nameController.text}');
-          Navigator.of(context).pushReplacementNamed(
-            '/lobby',
-            arguments: {
-              'connection': conn,
-              'username': nameController.text
-            }
-          );
-        }
+        createGame(context);
       }),
       child: Ink(
         width: 160,
@@ -59,6 +55,19 @@ class CreateScreen extends StatelessWidget {
     );
   }
 
+  void createGame(BuildContext context) {
+    if (formKey.currentState.validate()) {
+      Future<Connection> conn = Connection.createGame('${nameController.text}');
+      Navigator.of(context).pushReplacementNamed(
+        '/lobby',
+        arguments: {
+          'connection': conn,
+          'username': nameController.text
+        }
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,7 +86,7 @@ class CreateScreen extends StatelessWidget {
                 Padding(padding: EdgeInsets.only(top: 40),),
                 Text('ENTER YOUR NAME', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
                 Padding(padding: EdgeInsets.only(top: 10),),
-                buildNameField(),
+                buildNameField(context),
                 createButton(context)
               ]
             ),

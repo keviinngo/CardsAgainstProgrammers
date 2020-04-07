@@ -20,12 +20,17 @@ class JoinScreen extends StatelessWidget {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
-  Widget buildCodeField() {
+  Widget buildCodeField(BuildContext context) {
     return TextFormField(
       controller: codeController,
       maxLength: 4,
       maxLengthEnforced: true,
       textAlign: TextAlign.center,
+      onEditingComplete: () {
+        // Dismisses keyboard
+        FocusScope.of(context).unfocus();
+        joinGame(context);
+      },
       decoration: InputDecoration(
         hintText: '----',
         border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
@@ -43,12 +48,17 @@ class JoinScreen extends StatelessWidget {
     );
   }
 
-  Widget buildNameField() {
+  Widget buildNameField(BuildContext context) {
     return TextFormField(
       controller: nameController,
       maxLength: 20,
       maxLengthEnforced: true,
       textAlign: TextAlign.center,
+      onEditingComplete: () {
+        // Dismisses keyboard
+        FocusScope.of(context).unfocus();
+        joinGame(context);
+      },
       decoration: InputDecoration(
         hintText: '----',
         border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
@@ -67,23 +77,7 @@ class JoinScreen extends StatelessWidget {
     return InkWell(
       borderRadius: BorderRadius.all(Radius.circular(10)),
       onTap: (() {
-        if (formKey.currentState.validate()) {
-          Future<Connection> conn = Connection.checkCodeAndJoinGame('${nameController.text}', '${codeController.text}');
-          conn.then((connection) {
-            if (connection != null) {
-              Navigator.of(context).pushReplacementNamed('/lobby', arguments: {
-                  'connection': conn,
-                  'username': nameController.text
-              });
-            } else {
-              scaffoldKey.currentState.showSnackBar(SnackBar(
-                content: Text('Could not connect to lobby'),
-                duration: Duration(seconds: 4),
-                behavior: SnackBarBehavior.floating,
-              ));
-            }
-          });
-        }
+        joinGame(context);
       }),
       child: Ink(
         width: 160,
@@ -104,6 +98,28 @@ class JoinScreen extends StatelessWidget {
     );
   }
 
+  /// Sets in motion the action of joining a game
+  void joinGame(BuildContext context) {
+    if (formKey.currentState.validate()) {
+      Future<Connection> conn = Connection.checkCodeAndJoinGame('${nameController.text}', '${codeController.text}');
+      conn.then((connection) {
+        if (connection != null) {
+          Navigator.of(context).pushReplacementNamed('/lobby', arguments: {
+              'connection': conn,
+              'username': nameController.text
+          });
+        } else {
+          scaffoldKey.currentState.showSnackBar(SnackBar(
+            content: Text('Could not connect to lobby'),
+            duration: Duration(seconds: 4),
+            behavior: SnackBarBehavior.floating,
+          ));
+        }
+      });
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -123,11 +139,11 @@ class JoinScreen extends StatelessWidget {
                 Padding(padding: EdgeInsets.only(top: 40),),
                 Text('ROOM CODE', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
                 Padding(padding: EdgeInsets.only(top: 10),),
-                buildCodeField(),
+                buildCodeField(context),
                 Padding(padding: EdgeInsets.only(top: 20),),
                 Text('ENTER YOUR NAME', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
                 Padding(padding: EdgeInsets.only(top: 10),),
-                buildNameField(),
+                buildNameField(context),
                 joinButton(context)
               ]
             ),
