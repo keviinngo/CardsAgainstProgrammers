@@ -68,7 +68,7 @@ class GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
     // Animationcontroller and animation for the cards.
     animationController = AnimationController(vsync: this, duration: Duration(milliseconds: 500));
-    curve = CurvedAnimation(parent: animationController, curve: Curves.easeIn)
+    curve = CurvedAnimation(parent: animationController, curve: Curves.ease)
       ..addStatusListener((status) {} );
     opacity = Tween<double>(begin: 0.0, end: 1.0).animate(curve);
   }
