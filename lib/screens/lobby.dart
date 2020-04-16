@@ -610,7 +610,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
                       ),
                     ),
                     // Shows startgame button only when the player is a host.
-                    isHost ? startGame(conn, context) : Container(),
+                    isHost ? startGame(conn) : Container(),
                   ],
                 )
               ),
@@ -631,7 +631,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
   }
 
   /// Returns a button that sends the json message for starting the game.
-  Widget startGame(Future<Connection> conn, BuildContext context) {
+  Widget startGame(Future<Connection> conn) {
     return RaisedButton(
       onPressed: players.length >= 2 ? () {
         conn.then((connection) {
