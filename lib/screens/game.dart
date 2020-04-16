@@ -15,7 +15,7 @@ class GameScreen extends StatefulWidget {
   State<GameScreen> createState() => GameScreenState();
 }
 
-class GameScreenState extends State<GameScreen> with SingleTickerProviderStateMixin {
+class GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   GameController controller;
   Connection connection;
   BuildContext scaffoldContext;
@@ -66,15 +66,11 @@ class GameScreenState extends State<GameScreen> with SingleTickerProviderStateMi
 
     controller = GameController(connection, updateState, userName, isHost, );
 
-    animationController = AnimationController(vsync: this, duration: Duration(seconds: 1));
-    curve = CurvedAnimation(parent: animationController, curve: Curves.linear)
-      ..addStatusListener((status) {
-        if (status == AnimationStatus.dismissed) {
-          animationController.dispose();
-        }
-      });
+    // Animationcontroller and animation for the cards.
+    animationController = AnimationController(vsync: this, duration: Duration(milliseconds: 500));
+    curve = CurvedAnimation(parent: animationController, curve: Curves.easeIn)
+      ..addStatusListener((status) {} );
     opacity = Tween<double>(begin: 0.0, end: 1.0).animate(curve);
-    animationController.forward();
   }
 
   void pickWinner(int index) {
@@ -113,6 +109,8 @@ class GameScreenState extends State<GameScreen> with SingleTickerProviderStateMi
   }
 
   Widget buildCzarCard(BuildContext context, int index) {
+    animationController.reset();
+    animationController.forward();
     List<Widget> cards = [];
     for (var card in controller.submittedCards[index]['cards']) {
       cards.add(buildSingleCzarCard(context, index, card));
@@ -137,7 +135,7 @@ class GameScreenState extends State<GameScreen> with SingleTickerProviderStateMi
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemBuilder: (context, index) {
-          return buildCzarCard(context, index);
+          return FadeCard(buildCzarCard(context, index), animation: animationController);
         },
         itemCount: controller.submittedCards.length,
       ),
@@ -145,6 +143,8 @@ class GameScreenState extends State<GameScreen> with SingleTickerProviderStateMi
   }
 
   Widget buildHand({bool shade = false}) {
+    animationController.reset();
+    animationController.forward();
     final main = Column(
       children: <Widget>[
         Divider(),
@@ -355,6 +355,7 @@ class FadeCard extends AnimatedWidget {
 
   Widget build(BuildContext context) {
     final animation = listenable as Animation<double>;
+
     return Opacity(
         opacity: animation.value,
         child: child,
