@@ -15,11 +15,14 @@ class GameScreen extends StatefulWidget {
   State<GameScreen> createState() => GameScreenState();
 }
 
-class GameScreenState extends State<GameScreen>{
+class GameScreenState extends State<GameScreen> with SingleTickerProviderStateMixin {
   GameController controller;
   Connection connection;
   BuildContext scaffoldContext;
   final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
+  Animation<double> curve;
+  AnimationController animationController;
+  Animation<double> opacity;
 
   @override
   /// Called when the Lobby widget is removed, close any remaining connections.
@@ -28,6 +31,7 @@ class GameScreenState extends State<GameScreen>{
 
     connection.sendJson({'message': 'leave_game'});
     connection.socket.close();
+    animationController.dispose();
   }
 
   void updateState() {
@@ -61,6 +65,16 @@ class GameScreenState extends State<GameScreen>{
     }
 
     controller = GameController(connection, updateState, userName, isHost, );
+
+    animationController = AnimationController(vsync: this, duration: Duration(seconds: 1));
+    curve = CurvedAnimation(parent: animationController, curve: Curves.linear)
+      ..addStatusListener((status) {
+        if (status == AnimationStatus.dismissed) {
+          animationController.dispose();
+        }
+      });
+    opacity = Tween<double>(begin: 0.0, end: 1.0).animate(curve);
+    animationController.forward();
   }
 
   void pickWinner(int index) {
@@ -139,7 +153,7 @@ class GameScreenState extends State<GameScreen>{
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemBuilder: (context, index) {
-              return buildCard(context, index);
+              return FadeCard(buildCard(context, index), animation: opacity);
             },
             itemCount: controller.hand.length,
           ),
@@ -329,6 +343,21 @@ class GameScreenState extends State<GameScreen>{
           ),
         ),
       )
+    );
+  }
+}
+
+class FadeCard extends AnimatedWidget {
+  final Widget child;
+
+  FadeCard(this.child, {Key key, Animation<double> animation})
+      : super(key: key, listenable: animation);
+
+  Widget build(BuildContext context) {
+    final animation = listenable as Animation<double>;
+    return Opacity(
+        opacity: animation.value,
+        child: child,
     );
   }
 }
