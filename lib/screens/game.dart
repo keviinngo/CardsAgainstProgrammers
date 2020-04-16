@@ -67,21 +67,17 @@ class GameScreenState extends State<GameScreen>{
     connection.sendJson({'message': 'picked_winner', 'winner': controller.submittedCards[index]['id']});
   }
 
+  /// Builds inner czard card(s) for a card submission
   Widget buildSingleCzarCard(BuildContext context, int index, String text) {
     return Container(
       width: 200,
-      margin: EdgeInsets.fromLTRB(8, 0, 8, 5),
+      margin: EdgeInsets.fromLTRB(2, 0, 2, 0),
       decoration: BoxDecoration(
         border: Border.all(),
         borderRadius: BorderRadius.circular(8),
         //color: Colors.white
       ),
-      child: InkWell(
-        onTap: 
-          controller.state == GameState.wait_for_czar_pick && controller.currentCzar == controller.userName
-            ? () => pickWinner(index)
-            : null,
-        borderRadius: BorderRadius.circular(8),
+      child: Container(
         child: Container(
           margin: EdgeInsets.all(8 ),
           decoration: BoxDecoration(
@@ -98,6 +94,7 @@ class GameScreenState extends State<GameScreen>{
     );
   }
 
+  /// Builds a czard card for a card submission
   Widget buildCzarCard(BuildContext context, int index) {
     List<Widget> cards = [];
     for (var card in controller.submittedCards[index]['cards']) {
@@ -105,18 +102,28 @@ class GameScreenState extends State<GameScreen>{
     }
 
     return Container(
-      width: 200,
-      margin: EdgeInsets.fromLTRB(8, 0, 8, 5),
+      //width: 100 * cards.length.toDouble(),
+      padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
+      margin: EdgeInsets.fromLTRB(5, 0, 5, 5),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey),
+        border: Border.all(color: Theme.of(context).primaryColor, width: 2.0),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Column(
-        children: cards,
+      child: InkWell(
+        onTap: controller.state == GameState.wait_for_czar_pick && controller.currentCzar == controller.userName
+          ? () => pickWinner(index)
+          : null,
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: cards
+          ),
+        )
       ),
     );
   }
 
+  /// Builds the hand for the czar when choosing a winner
   Widget buildCzarHand() {
     return Container(
       height: MediaQuery.of(context).size.height * 0.2,
@@ -130,6 +137,7 @@ class GameScreenState extends State<GameScreen>{
     );
   }
 
+  /// Builds the hand for the players
   Widget buildHand({bool shade = false}) {
     final main = Column(
       children: <Widget>[
@@ -149,12 +157,8 @@ class GameScreenState extends State<GameScreen>{
     return controller.showCards
       ? (!shade
         ? main
-        : Container(
-          decoration: BoxDecoration(
-            color: Colors.black38.withAlpha(128)
-          ),
-          child: main,  
-        ))
+        : Container()
+        )
       : (controller.connecting
         ? CircularProgressIndicator(value: null,)
         : Container());
