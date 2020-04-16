@@ -55,6 +55,8 @@ class Connection {
   void Function(String) onWinner;
   /// The callback is called when a new call card is sent
   void Function(String, int) onNewCallCard;
+  /// Called when we receiece an "invalid_deck_id" message
+  void Function() onInvalidDeckId;
 
   /// Connection constructor.
   /// 
@@ -171,6 +173,10 @@ class Connection {
         // Promoted to host by server
         if(json['message'] == 'promoted_to_host' && onPromoted != null) {
           onPromoted();
+        }
+
+        if(json['message'] == 'invalid_deck_id' && onInvalidDeckId != null) {
+          onInvalidDeckId();
         }
 
         // 
