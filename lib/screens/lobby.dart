@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 /// Lobby settings.
 class LobbySettings {
   int  scoreToWin = 5;
+  //TODO: We need some sort of default. I suggest havind and endpoint on the db api serving the "defualt" deck id.
   int  activeDeck = 0;
 }
 
@@ -95,7 +96,6 @@ class DeckSelectionDialogState extends State<DeckSelectionDialog> {
                       subtitle: Text(deck.description),
                       onTap: () {
                         print("We want: " + deck.title);
-                        //TODO: Do something with the thing we return
                         Navigator.of(context).pop(deck.id);
                       },
                   ));
@@ -285,12 +285,14 @@ class _LobbyScreenState extends State<LobbyScreen> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final GlobalKey kickYourselfSnackbarKey = GlobalKey();
   final GlobalKey<AnimatedListState> playerListKey = GlobalKey();
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>(); 
 
   final Tween<Offset> slideIn = Tween<Offset>(begin: Offset(-1, 0), end: Offset.zero);
   final Tween<Offset> slideOut = Tween<Offset>(begin: Offset(1, 0), end: Offset.zero);
 
   final int maxPlayers = 16;
 
+  List<SnackBar> snackbars = List<SnackBar>();
   List<String> players = List<String>();
   String userName;
   String lobbyCode;
@@ -434,6 +436,15 @@ class _LobbyScreenState extends State<LobbyScreen> {
           isHost = true;
         });
       };
+
+      connection.onInvalidDeckId = () {
+        setState(() {
+          snackbars.add(SnackBar(
+            content: Text("The deck you were trying to use, no longer exists."),
+            behavior: SnackBarBehavior.floating,
+          ));
+        });
+      };
     });
   }
 
@@ -525,7 +536,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
     );
   }
 
-  //TODO: Show an indication for users themselves
+  //TODO: Show an indication for users themselves. Something that lets users know what their username is.
   /// [ListView] of players in the lobby.
   Widget buildPlayerList() {
     return ClipRect(child: Container(
@@ -548,7 +559,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    final scaffold = Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
         title: Text('Lobby'),
         actions: <Widget>[
@@ -577,7 +589,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
                 // Room code.
                 padding: EdgeInsets.all(5),
                 child: Text(
-                  "Room code: $lobbyCode", //TODO: Code here
+                  "Room code: $lobbyCode",
                   style: TextStyle(
                     fontSize: 32,
                     fontFamily: 'monospace',
@@ -610,6 +622,13 @@ class _LobbyScreenState extends State<LobbyScreen> {
         )
       ),
     );
+
+    for(var sb in snackbars) {
+      scaffoldKey.currentState.showSnackBar(sb);
+    }
+    snackbars.clear();
+
+    return scaffold;
   }
 
   /// Returns a button that sends the json message for starting the game.
@@ -617,9 +636,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
     return RaisedButton(
       onPressed: players.length >= 2 ? () {
         conn.then((connection) {
-          //TODO: send the deck we want to use
           connection.sendJson(
-            {"message": "start_game"}
+            {"message": "start_game", "deckid": settings.activeDeck, "win_score": settings.scoreToWin}
           );
         });
       } : null,

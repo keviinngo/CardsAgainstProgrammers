@@ -55,6 +55,8 @@ class Connection {
   void Function(String) onWinner;
   /// The callback is called when a new call card is sent
   void Function(String, int) onNewCallCard;
+  /// Called when we receiece an "invalid_deck_id" message
+  void Function() onInvalidDeckId;
 
   /// Connection constructor.
   /// 
@@ -132,8 +134,6 @@ class Connection {
         }
         break;
       case ConnectionState.joiningGame:
-        // TODO: Handle this case.
-
         if (json['message'] != 'joined_game') {
           return;
         }
@@ -156,7 +156,7 @@ class Connection {
         }
 
         code = json['code'];
-        // TODO: Verify code.
+        // TODO: Verify code. Why? We trust the server dont we?
         onGameCreated();
 
         state = ConnectionState.inLobby;
@@ -173,8 +173,10 @@ class Connection {
           onPromoted();
         }
 
-        // 
-        // TODO: Handle this case.
+        if(json['message'] == 'invalid_deck_id' && onInvalidDeckId != null) {
+          onInvalidDeckId();
+        }
+
         break;
       case ConnectionState.inGame:
 

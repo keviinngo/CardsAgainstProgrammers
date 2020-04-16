@@ -85,7 +85,6 @@ class GameController {
     connection.onNewCzar = (czar) {
       this.currentCzar = czar;
       if (czar == userName) {
-        // TODO: Implement this.
         isCzar = true;
       } else {
         isCzar = false;
