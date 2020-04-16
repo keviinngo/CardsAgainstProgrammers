@@ -134,8 +134,6 @@ class Connection {
         }
         break;
       case ConnectionState.joiningGame:
-        // TODO: Handle this case.
-
         if (json['message'] != 'joined_game') {
           return;
         }
@@ -158,7 +156,7 @@ class Connection {
         }
 
         code = json['code'];
-        // TODO: Verify code.
+        // TODO: Verify code. Why? We trust the server dont we?
         onGameCreated();
 
         state = ConnectionState.inLobby;
@@ -179,8 +177,6 @@ class Connection {
           onInvalidDeckId();
         }
 
-        // 
-        // TODO: Handle this case.
         break;
       case ConnectionState.inGame:
 

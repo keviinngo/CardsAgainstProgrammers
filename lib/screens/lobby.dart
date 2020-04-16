@@ -95,7 +95,6 @@ class DeckSelectionDialogState extends State<DeckSelectionDialog> {
                       subtitle: Text(deck.description),
                       onTap: () {
                         print("We want: " + deck.title);
-                        //TODO: Do something with the thing we return
                         Navigator.of(context).pop(deck.id);
                       },
                   ));
@@ -536,7 +535,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
     );
   }
 
-  //TODO: Show an indication for users themselves
+  //TODO: Show an indication for users themselves. Something that lets users know what their username is.
   /// [ListView] of players in the lobby.
   Widget buildPlayerList() {
     return ClipRect(child: Container(
@@ -589,7 +588,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
                 // Room code.
                 padding: EdgeInsets.all(5),
                 child: Text(
-                  "Room code: $lobbyCode", //TODO: Code here
+                  "Room code: $lobbyCode",
                   style: TextStyle(
                     fontSize: 32,
                     fontFamily: 'monospace',
@@ -636,9 +635,6 @@ class _LobbyScreenState extends State<LobbyScreen> {
     return RaisedButton(
       onPressed: players.length >= 2 ? () {
         conn.then((connection) {
-          //TODO: send the deck we want to use
-          // TODO: The deck could be deleted as we send it, so could potenially get
-          // "invalid_deck_id" in return. Handle that.
           connection.sendJson(
             {"message": "start_game", "deckid": settings.activeDeck}
           );
