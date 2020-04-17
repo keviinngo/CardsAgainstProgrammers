@@ -82,3 +82,13 @@ Future<List<Card>> getAllCardsInDeck(Deck deck) async {
 
   return result;
 }
+
+Future<Deck> getDeckFromId(int id) async {
+  var json = await fetchJson(Uri.parse(apiRoot+'/deck/' + id.toString()));
+  if (json == null || json.containsKey("detail")) {
+    return null;
+  }
+
+  Deck result = Deck.fromJson(json);
+  return result;
+}

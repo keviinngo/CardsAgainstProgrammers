@@ -27,4 +27,7 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
+
+    <!-- We would like to use the internet please. -->
+    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>
