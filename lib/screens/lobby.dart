@@ -1,4 +1,4 @@
-import 'package:cap/controllers/connectionController.dart';
+import 'package:cap/controllers/connectionController.dart' as connectionController;
 import 'package:cap/util/cards.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -233,12 +233,43 @@ class LobbySettingsDialogState extends State<LobbySettingsDialog> {
 
                             deck.then((deckid) {
                               if (deckid.runtimeType == int) {
-                                settings.activeDeck = deckid;
+                                setState(() {                                
+                                  settings.activeDeck = deckid;
+                                });
                               }
                             });
                           },
                         ),
                       ),
+                      SettingsDialogItem(
+                        left: Container(
+                          width: 200,
+                          child: ListTile(
+                            contentPadding: EdgeInsets.all(0),
+                            title: Text("Current deck"),
+                            subtitle: FutureBuilder(
+                              future: getDeckFromId(settings.activeDeck),
+                              builder: (context, AsyncSnapshot<Deck> snapshot) {
+                                if (snapshot.connectionState == ConnectionState.done) {
+                                  Deck deck = snapshot.data;
+                                  if (deck == null) {
+                                    return Text("Deck is no longer available");
+                                  } else {
+                                    return Text(deck.title);
+                                  }
+                                } else if (snapshot.hasError) {
+                                  return Text("Failed to fetch deck infomation");
+                                } else {
+                                  return Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                        right: Container(),
+                      )
                     ],
                   )
                 ),
@@ -248,10 +279,8 @@ class LobbySettingsDialogState extends State<LobbySettingsDialog> {
                   child: RaisedButton(
                     color: Colors.blue,
                     textColor: Colors.white,
-                    child: Text('Save'),
+                    child: Text('Ok'),
                     onPressed: () {
-                      //TODO: Have a way to cancel changes.
-                      // Probably a cancel button, plus only doing changes after 'Save'
                       Navigator.of(context).pop();
                     },
                   ),
@@ -298,7 +327,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
   String lobbyCode;
   bool isHost;
   LobbySettings settings;
-  Future<Connection> conn;
+  Future<connectionController.Connection> conn;
   bool willDispose = true;
   bool loading = true;
 
@@ -345,6 +374,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
             ],
           );
         });
+
+        return;
       }
 
       // connection.codeIsValidFuture.future.then((val) {
@@ -632,7 +663,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
   }
 
   /// Returns a button that sends the json message for starting the game.
-  Widget startGame(Future<Connection> conn) {
+  Widget startGame(Future<connectionController.Connection> conn) {
     return RaisedButton(
       onPressed: players.length >= 2 ? () {
         conn.then((connection) {
