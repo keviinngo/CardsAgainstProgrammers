@@ -299,7 +299,7 @@ class GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                 children: <Widget>[
                   scoreboard,
                   Spacer(),
-                  RaisedButton( //TODO: maybe have dialog box 
+                  RaisedButton(
                     child: Text("Leave game", textAlign: TextAlign.center,),
                     onPressed: () {
                       var leaving = showDialog(
@@ -377,7 +377,7 @@ class GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
         ),
         child: Column(
           children: <Widget>[
-            // TODO: Update layout
+            // TODO: Update layout mayb
             Text(
               controller.hand[selectedCard].values.toList()[0],
               softWrap: true,
