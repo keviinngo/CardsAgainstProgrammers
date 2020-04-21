@@ -301,7 +301,34 @@ class GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                   Spacer(),
                   RaisedButton( //TODO: maybe have dialog box 
                     child: Text("Leave game", textAlign: TextAlign.center,),
-                    onPressed: () {exitGame();},
+                    onPressed: () {
+                      var leaving = showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Text("Are you sure you want to leave?"),
+                          actions: <Widget>[
+                            FlatButton(
+                              onPressed: () {
+                                Navigator.of(context).pop(true);
+                              },
+                              child: Text("Yes"),
+                            ),
+                            FlatButton(
+                              onPressed: () {
+                                Navigator.of(context).pop(false);
+                              },
+                              child: Text("No"),
+                            )
+                          ],
+                        ),
+                      );
+                      
+                      leaving.then((leaving) {
+                        if (leaving) {
+                          exitGame();
+                        }
+                      });
+                    },
                     color: Colors.amber,
                   ),
                   Padding(padding: EdgeInsets.only(bottom: 20),)
