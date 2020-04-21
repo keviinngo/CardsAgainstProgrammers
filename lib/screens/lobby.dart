@@ -250,8 +250,6 @@ class LobbySettingsDialogState extends State<LobbySettingsDialog> {
                     textColor: Colors.white,
                     child: Text('Save'),
                     onPressed: () {
-                      //TODO: Have a way to cancel changes.
-                      // Probably a cancel button, plus only doing changes after 'Save'
                       Navigator.of(context).pop();
                     },
                   ),

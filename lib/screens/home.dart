@@ -59,7 +59,6 @@ class HomeScreen extends StatelessWidget{
     );
   }
 
-  // TODO: Aspect ratio
 
   /// [InkWell] button that sends you to the join screen
   Widget joinButton(context) {

@@ -156,7 +156,6 @@ class Connection {
         }
 
         code = json['code'];
-        // TODO: Verify code. Why? We trust the server dont we?
         onGameCreated();
 
         state = ConnectionState.inLobby;

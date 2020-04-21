@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 import "connectionController.dart";
 
 enum GameState {
@@ -53,7 +51,6 @@ class GameController {
   List<dynamic> cardsToSubmit = [];
 
   //TODO: Cancel game when there is less than 3 players left
-  //TODO: Show snackbar when someone is kicked
 
   //TODO: +Server, How do we handle disconnects mid-round?
   //               Likewise, how do we handle new czar mid-round?

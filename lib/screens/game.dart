@@ -20,9 +20,10 @@ class GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   Connection connection;
   BuildContext scaffoldContext;
   final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
-  Animation<double> curve;
-  AnimationController animationController;
-  Animation<double> opacity;
+  Animation<double> curveCard, curveSelected;
+  AnimationController animationControllerCard, animationControllerSelected;
+  Animation<double> opacityCard, opacitySelected;
+  int selectedCard = -1;
 
   @override
   /// Called when the Lobby widget is removed, close any remaining connections.
@@ -31,7 +32,7 @@ class GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
     connection.sendJson({'message': 'leave_game'});
     connection.socket.close();
-    animationController.dispose();
+    animationControllerCard.dispose();
   }
 
   void updateState() {
@@ -67,10 +68,16 @@ class GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     controller = GameController(connection, updateState, userName, isHost, );
 
     // Animationcontroller and animation for the cards.
-    animationController = AnimationController(vsync: this, duration: Duration(milliseconds: 500));
-    curve = CurvedAnimation(parent: animationController, curve: Curves.ease)
+    animationControllerCard = AnimationController(vsync: this, duration: Duration(milliseconds: 500));
+    curveCard = CurvedAnimation(parent: animationControllerCard, curve: Curves.ease)
       ..addStatusListener((status) {} );
-    opacity = Tween<double>(begin: 0.0, end: 1.0).animate(curve);
+    opacityCard = Tween<double>(begin: 0.0, end: 1.0).animate(curveCard);
+
+    //Animation and controller for when selecting a card to submitt
+    animationControllerSelected = AnimationController(vsync: this, duration: Duration(milliseconds: 500));
+    curveSelected = CurvedAnimation(parent: animationControllerCard, curve: Curves.ease)
+      ..addStatusListener((status) {} );
+    opacitySelected = Tween<double>(begin: 0.0, end: 1.0).animate(curveSelected);
   }
 
   void pickWinner(int index) {
@@ -109,8 +116,11 @@ class GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   }
 
   Widget buildCzarCard(BuildContext context, int index) {
-    animationController.reset();
-    animationController.forward();
+    if (selectedCard == -1) {
+      animationControllerCard.reset();
+      animationControllerCard.forward();
+    }
+    
     List<Widget> cards = [];
     for (var card in controller.submittedCards[index]['cards']) {
       cards.add(buildSingleCzarCard(context, index, card));
@@ -135,7 +145,7 @@ class GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemBuilder: (context, index) {
-          return FadeCard(buildCzarCard(context, index), animation: animationController);
+          return FadeCard(buildCzarCard(context, index), animation: animationControllerCard);
         },
         itemCount: controller.submittedCards.length,
       ),
@@ -143,8 +153,10 @@ class GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   }
 
   Widget buildHand({bool shade = false}) {
-    animationController.reset();
-    animationController.forward();
+    if (selectedCard == -1) {
+      animationControllerCard.reset();
+      animationControllerCard.forward();
+    }
     final main = Column(
       children: <Widget>[
         Divider(),
@@ -153,7 +165,7 @@ class GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemBuilder: (context, index) {
-              return FadeCard(buildCard(context, index), animation: opacity);
+              return FadeCard(buildCard(context, index), animation: opacityCard);
             },
             itemCount: controller.hand.length,
           ),
@@ -227,7 +239,6 @@ class GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   Widget buildScoreboard() {
     var rows = <TableRow>[];
 
-    //TODO: Make it possible for the host to kick users here
     for (var player in controller.players) {
       var prefix = "";
 
@@ -302,6 +313,7 @@ class GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                 Padding(padding: EdgeInsets.only(top: 16)),
                 callingCard,
                 buildStatus(),
+                showSelectedCard(),
                 Spacer(),
                 controller.state == GameState.wait_for_czar_pick
                   ? buildCzarHand()
@@ -312,6 +324,45 @@ class GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
         )
       ),
     );
+  }
+
+  Widget showSelectedCard() {
+    print(selectedCard);
+
+    if (selectedCard != -1) {
+      animationControllerSelected.reset();
+      animationControllerSelected.forward();
+      return FadeCard(SizedBox(
+        child: Container(
+          margin: EdgeInsets.fromLTRB(8, 0, 8, 5),
+          decoration: BoxDecoration(
+            border: Border.all(),
+            borderRadius: BorderRadius.circular(8),
+            //color: Colors.white
+          ),
+          child: InkWell(
+            onTap: () {},
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              margin: EdgeInsets.all(8),
+              decoration: BoxDecoration(
+              ),
+              child: Text(
+                controller.hand[selectedCard].values.toList()[0],
+                softWrap: true,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold
+                ),
+              ),
+            ),
+          )
+        ),
+      ), animation: animationControllerSelected);
+    } else {
+      return Container(
+
+      );
+    }
   }
 
   // The list of cards to be shown
@@ -327,11 +378,18 @@ class GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       child: InkWell(
         onTap: 
           controller.state == GameState.submit_cards && controller.currentCzar != controller.userName
-            ? () => controller.submitCard(index)
+            ? () {
+              setState(() {
+                selectedCard = index;
+              });
+              //TODO: show selected card. 
+              //TODO: Remove selected card after confirming
+              //controller.submitCard(index);
+            }
             : null,
         borderRadius: BorderRadius.circular(8),
         child: Container(
-          margin: EdgeInsets.all(8 ),
+          margin: EdgeInsets.all(8),
           decoration: BoxDecoration(
           ),
           child: Text(
