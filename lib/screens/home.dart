@@ -14,11 +14,11 @@ class HomeScreen extends StatelessWidget{
           direction: Axis.vertical,
           children: <Widget>[
             Spacer(flex: 5),
-            FadeIn(1.0, titleCard(context)),
+            titleCard(context),
             Spacer(flex: 10),
-            FadeIn(2.33, joinButton(context)),
+            FadeIn(0.0, joinButton(context)),
             Spacer(flex: 5),
-            FadeIn(2.66, createButton(context)),
+            FadeIn(1.0, createButton(context)),
             Spacer(flex: 50)
           ],
         )
@@ -59,7 +59,6 @@ class HomeScreen extends StatelessWidget{
     );
   }
 
-  // TODO: Aspect ratio
 
   /// [InkWell] button that sends you to the join screen
   Widget joinButton(context) {
@@ -125,15 +124,16 @@ class FadeIn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenwidth = MediaQuery.of(context).size.width;
     //Tweens multiple properties at once
     final tween = MultiTrackTween([
       //Setting opacity from invisible to fully visible
       Track("opacity")
-        .add(Duration(milliseconds: 500), Tween(begin: 0.0, end: 1.0)),
+        .add(Duration(milliseconds: 500), Tween(begin: 0.0, end: 1.0), curve: Curves.easeInCubic),
       //Translate on the x-axis from displaced to unmodified
       Track("transelateX").add(
-        Duration(milliseconds: 500), Tween(begin: 600.0, end: 0.0),
-        curve: Curves.easeOut)
+        Duration(milliseconds: 700), Tween(begin: screenwidth * 0.40, end: 0.0),
+        curve: Curves.easeOutQuart)
     ]);
 
     return ControlledAnimation(

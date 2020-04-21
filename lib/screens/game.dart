@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:cap/controllers/connectionController.dart';
 import 'package:cap/controllers/gameController.dart';
+import 'package:cap/main.dart';
 import 'package:flutter/material.dart';
 
 
@@ -15,11 +16,15 @@ class GameScreen extends StatefulWidget {
   State<GameScreen> createState() => GameScreenState();
 }
 
-class GameScreenState extends State<GameScreen>{
+class GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   GameController controller;
   Connection connection;
   BuildContext scaffoldContext;
   final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
+  Animation<double> curveCard, curveSelected;
+  AnimationController animationControllerCard, animationControllerSelected;
+  Animation<double> opacityCard, opacitySelected;
+  int selectedCard = -1;
 
   @override
   /// Called when the Lobby widget is removed, close any remaining connections.
@@ -28,6 +33,7 @@ class GameScreenState extends State<GameScreen>{
 
     connection.sendJson({'message': 'leave_game'});
     connection.socket.close();
+    animationControllerCard.dispose();
   }
 
   void updateState() {
@@ -61,6 +67,18 @@ class GameScreenState extends State<GameScreen>{
     }
 
     controller = GameController(connection, updateState, userName, isHost, );
+
+    // Animationcontroller and animation for the cards.
+    animationControllerCard = AnimationController(vsync: this, duration: Duration(milliseconds: 500));
+    curveCard = CurvedAnimation(parent: animationControllerCard, curve: Curves.ease)
+      ..addStatusListener((status) {} );
+    opacityCard = Tween<double>(begin: 0.0, end: 1.0).animate(curveCard);
+
+    //Animation and controller for when selecting a card to submitt
+    animationControllerSelected = AnimationController(vsync: this, duration: Duration(milliseconds: 500));
+    curveSelected = CurvedAnimation(parent: animationControllerCard, curve: Curves.ease)
+      ..addStatusListener((status) {} );
+    opacitySelected = Tween<double>(begin: 0.0, end: 1.0).animate(curveSelected);
   }
 
   void pickWinner(int index) {
@@ -96,6 +114,11 @@ class GameScreenState extends State<GameScreen>{
 
   /// Builds a czard card for a card submission
   Widget buildCzarCard(BuildContext context, int index) {
+    if (selectedCard == -1) {
+      animationControllerCard.reset();
+      animationControllerCard.forward();
+    }
+    
     List<Widget> cards = [];
     for (var card in controller.submittedCards[index]['cards']) {
       cards.add(buildSingleCzarCard(context, index, card));
@@ -130,7 +153,7 @@ class GameScreenState extends State<GameScreen>{
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemBuilder: (context, index) {
-          return buildCzarCard(context, index);
+          return FadeCard(buildCzarCard(context, index), animation: animationControllerCard);
         },
         itemCount: controller.submittedCards.length,
       ),
@@ -139,6 +162,10 @@ class GameScreenState extends State<GameScreen>{
 
   /// Builds the hand for the players
   Widget buildHand({bool shade = false}) {
+    if (selectedCard == -1) {
+      animationControllerCard.reset();
+      animationControllerCard.forward();
+    }
     final main = Column(
       children: <Widget>[
         Divider(),
@@ -147,7 +174,7 @@ class GameScreenState extends State<GameScreen>{
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemBuilder: (context, index) {
-              return buildCard(context, index);
+              return FadeCard(buildCard(context, index), animation: opacityCard);
             },
             itemCount: controller.hand.length,
           ),
@@ -217,7 +244,6 @@ class GameScreenState extends State<GameScreen>{
   Widget buildScoreboard() {
     var rows = <TableRow>[];
 
-    //TODO: Make it possible for the host to kick users here
     for (var player in controller.players) {
       var prefix = "";
 
@@ -255,6 +281,7 @@ class GameScreenState extends State<GameScreen>{
     );
   }
 
+  // Main build function
   @override
   Widget build(BuildContext context) {
     final scoreboard = buildScoreboard();
@@ -284,7 +311,7 @@ class GameScreenState extends State<GameScreen>{
           )
         ),
         body: Center(
-          // SafeArea to nok draw under notch
+          // SafeArea to not draw under notch
           child: SafeArea(
             child: Flex(
               direction: Axis.vertical,
@@ -292,6 +319,7 @@ class GameScreenState extends State<GameScreen>{
                 Padding(padding: EdgeInsets.only(top: 16)),
                 callingCard,
                 buildStatus(),
+                Expanded(flex: 9, child: showSelectedCard()),
                 Spacer(),
                 controller.state == GameState.wait_for_czar_pick
                   ? buildCzarHand()
@@ -302,6 +330,59 @@ class GameScreenState extends State<GameScreen>{
         )
       ),
     );
+  }
+
+  Widget showSelectedCard() {
+    if (selectedCard != -1) {
+      animationControllerSelected.reset();
+      animationControllerSelected.forward();
+      return FadeCard(Container(
+        constraints: BoxConstraints(
+          minWidth: 250,
+          maxWidth: 250,
+        ),
+        margin: EdgeInsets.fromLTRB(8, 0, 8, 5),
+        padding: EdgeInsets.fromLTRB(8, 10, 8, 10),
+        decoration: BoxDecoration(
+          border: Border.all(),
+          borderRadius: BorderRadius.circular(8),
+          //color: Colors.white
+        ),
+        child: Column(
+          children: <Widget>[
+            // TODO: Update layout
+            Text(
+              controller.hand[selectedCard].values.toList()[0],
+              softWrap: true,
+              style: TextStyle(
+                fontWeight: FontWeight.bold
+              ),
+            ),
+            Spacer(),
+            Divider(),
+            Container(
+              width: 100,
+              child: FlatButton(
+                onPressed: () {
+                  controller.submitCard(this.selectedCard);
+                  setState(() {
+                    selectedCard = -1;
+                  });
+                },
+                child: Center(
+                  child: Text("Confirm"),
+                ),
+              ),
+            )
+          ],
+        )
+      )
+    , animation: animationControllerSelected);
+    } else {
+      return Container(
+
+      );
+    }
   }
 
   // The list of cards to be shown
@@ -317,11 +398,16 @@ class GameScreenState extends State<GameScreen>{
       child: InkWell(
         onTap: 
           controller.state == GameState.submit_cards && controller.currentCzar != controller.userName
-            ? () => controller.submitCard(index)
+            ? () {
+              setState(() {
+                selectedCard = index;
+              });
+              //controller.submitCard(index);
+            }
             : null,
         borderRadius: BorderRadius.circular(8),
         child: Container(
-          margin: EdgeInsets.all(8 ),
+          margin: EdgeInsets.all(8),
           decoration: BoxDecoration(
           ),
           child: Text(
@@ -333,6 +419,22 @@ class GameScreenState extends State<GameScreen>{
           ),
         ),
       )
+    );
+  }
+}
+
+class FadeCard extends AnimatedWidget {
+  final Widget child;
+
+  FadeCard(this.child, {Key key, Animation<double> animation})
+      : super(key: key, listenable: animation);
+
+  Widget build(BuildContext context) {
+    final animation = listenable as Animation<double>;
+
+    return Opacity(
+        opacity: animation.value,
+        child: child,
     );
   }
 }
