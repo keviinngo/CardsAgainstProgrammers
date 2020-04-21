@@ -50,7 +50,7 @@ class GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   }
 
   void exitGame() {
-    Navigator.of(context).pushReplacementNamed('/');
+    Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
   }
 
   @override

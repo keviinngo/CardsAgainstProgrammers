@@ -430,7 +430,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
               actions: <Widget>[
                 RaisedButton(
                   onPressed: () {
-                    Navigator.of(context).pushReplacementNamed('/');
+                    Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
                   },
                 )
               ],
@@ -458,7 +458,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
       connection.onStarted = () {
         willDispose = false;
         connection.onJoin = null;
-        Navigator.of(context).pushReplacementNamed('/game',
+        Navigator.of(context).pushNamedAndRemoveUntil('/game', (route) => false,
         arguments: {
           'players': players,
           'isHost': isHost,
