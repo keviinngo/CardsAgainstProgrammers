@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 class LobbySettings {
   int  scoreToWin = 5;
   //TODO: We need some sort of default. I suggest havind and endpoint on the db api serving the "defualt" deck id.
-  int  activeDeck = 0;
+  int  activeDeck = -1;
 }
 
 
@@ -350,6 +350,10 @@ class _LobbyScreenState extends State<LobbyScreen> {
     isHost = false;
     super.initState();
     settings = LobbySettings();
+
+    getDefaultDeck().then((deck) {
+      settings.activeDeck = deck.id;
+    });
 
     userName = widget.arguments['username'];
     conn = widget.arguments['connection'];
