@@ -92,3 +92,10 @@ Future<Deck> getDeckFromId(int id) async {
   Deck result = Deck.fromJson(json);
   return result;
 }
+
+Future<Deck> getDefaultDeck() async {
+  var json = await fetchJson(Uri.parse(apiRoot+'/deck/default/'));
+  var deck = Deck.fromJson(json);
+
+  return deck;
+}
