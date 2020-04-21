@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:cap/controllers/connectionController.dart';
 import 'package:cap/controllers/gameController.dart';
+import 'package:cap/main.dart';
 import 'package:flutter/material.dart';
 
 
@@ -276,6 +277,7 @@ class GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     );
   }
 
+  // Main build function
   @override
   Widget build(BuildContext context) {
     final scoreboard = buildScoreboard();
@@ -305,7 +307,7 @@ class GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
           )
         ),
         body: Center(
-          // SafeArea to nok draw under notch
+          // SafeArea to not draw under notch
           child: SafeArea(
             child: Flex(
               direction: Axis.vertical,
@@ -313,7 +315,7 @@ class GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                 Padding(padding: EdgeInsets.only(top: 16)),
                 callingCard,
                 buildStatus(),
-                showSelectedCard(),
+                Expanded(flex: 9, child: showSelectedCard()),
                 Spacer(),
                 controller.state == GameState.wait_for_czar_pick
                   ? buildCzarHand()
@@ -327,37 +329,51 @@ class GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   }
 
   Widget showSelectedCard() {
-    print(selectedCard);
-
     if (selectedCard != -1) {
       animationControllerSelected.reset();
       animationControllerSelected.forward();
-      return FadeCard(SizedBox(
-        child: Container(
-          margin: EdgeInsets.fromLTRB(8, 0, 8, 5),
-          decoration: BoxDecoration(
-            border: Border.all(),
-            borderRadius: BorderRadius.circular(8),
-            //color: Colors.white
-          ),
-          child: InkWell(
-            onTap: () {},
-            borderRadius: BorderRadius.circular(8),
-            child: Container(
-              margin: EdgeInsets.all(8),
-              decoration: BoxDecoration(
-              ),
-              child: Text(
-                controller.hand[selectedCard].values.toList()[0],
-                softWrap: true,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold
-                ),
+      return FadeCard(Container(
+        constraints: BoxConstraints(
+          minWidth: 250,
+          maxWidth: 250,
+        ),
+        margin: EdgeInsets.fromLTRB(8, 0, 8, 5),
+        padding: EdgeInsets.fromLTRB(8, 10, 8, 10),
+        decoration: BoxDecoration(
+          border: Border.all(),
+          borderRadius: BorderRadius.circular(8),
+          //color: Colors.white
+        ),
+        child: Column(
+          children: <Widget>[
+            // TODO: Update layout
+            Text(
+              controller.hand[selectedCard].values.toList()[0],
+              softWrap: true,
+              style: TextStyle(
+                fontWeight: FontWeight.bold
               ),
             ),
-          )
-        ),
-      ), animation: animationControllerSelected);
+            Spacer(),
+            Divider(),
+            Container(
+              width: 100,
+              child: FlatButton(
+                onPressed: () {
+                  controller.submitCard(this.selectedCard);
+                  setState(() {
+                    selectedCard = -1;
+                  });
+                },
+                child: Center(
+                  child: Text("Confirm"),
+                ),
+              ),
+            )
+          ],
+        )
+      )
+    , animation: animationControllerSelected);
     } else {
       return Container(
 
@@ -382,8 +398,6 @@ class GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
               setState(() {
                 selectedCard = index;
               });
-              //TODO: show selected card. 
-              //TODO: Remove selected card after confirming
               //controller.submitCard(index);
             }
             : null,
