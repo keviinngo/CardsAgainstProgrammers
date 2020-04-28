@@ -46,11 +46,31 @@ class GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     }
     controller.snackMessages.clear();
 
+    if (controller.gameWinnerUsername != "") {
+      var leaving = showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Winner announced"),
+          content: Row(children: <Widget>[
+            Text("The winner is ${controller.gameWinnerUsername}!")
+          ],),
+          actions: <Widget>[
+            FlatButton(
+              onPressed: () {
+                exitGame();
+              },
+              child: Text("Exit game"),
+            )
+          ],
+        ),
+      );
+    }
+
     setState(() {});
   }
 
   void exitGame() {
-    Navigator.of(context).pushReplacementNamed('/');
+    Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
   }
 
   @override
