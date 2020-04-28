@@ -58,7 +58,7 @@ class CreateScreen extends StatelessWidget {
   void createGame(BuildContext context) {
     if (formKey.currentState.validate()) {
       Future<Connection> conn = Connection.createGame('${nameController.text}');
-      Navigator.of(context).pushNamedAndRemoveUntil('/lobby', (route) => false,
+      Navigator.of(context).pushNamed('/lobby',
       arguments: {
           'connection': conn,
           'username': nameController.text
