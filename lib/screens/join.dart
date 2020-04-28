@@ -104,7 +104,7 @@ class JoinScreen extends StatelessWidget {
       Future<Connection> conn = Connection.checkCodeAndJoinGame('${nameController.text}', '${codeController.text}');
       conn.then((connection) {
         if (connection != null) {
-          Navigator.of(context).pushNamedAndRemoveUntil('/lobby', (route) => false, arguments: {
+          Navigator.of(context).pushNamed('/lobby', arguments: {
               'connection': conn,
               'username': nameController.text
           });
