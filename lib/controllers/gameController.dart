@@ -50,8 +50,6 @@ class GameController {
   /// Number of cards currently submitted, flushed when it reaches cardsToSubmit.length == callCardBlanks.
   List<dynamic> cardsToSubmit = [];
 
-  //TODO: Cancel game when there is less than 3 players left
-
   //TODO: +Server, How do we handle disconnects mid-round?
   //               Likewise, how do we handle new czar mid-round?
 

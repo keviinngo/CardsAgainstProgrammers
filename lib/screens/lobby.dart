@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 /// Lobby settings.
 class LobbySettings {
   int  scoreToWin = 5;
-  //TODO: We need some sort of default. I suggest havind and endpoint on the db api serving the "defualt" deck id.
   int  activeDeck = -1;
 }
 
@@ -430,7 +429,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
               actions: <Widget>[
                 RaisedButton(
                   onPressed: () {
-                    Navigator.of(context).pushReplacementNamed('/');
+                    Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
                   },
                 )
               ],
@@ -458,7 +457,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
       connection.onStarted = () {
         willDispose = false;
         connection.onJoin = null;
-        Navigator.of(context).pushReplacementNamed('/game',
+        Navigator.of(context).pushNamedAndRemoveUntil('/game', (route) => false,
         arguments: {
           'players': players,
           'isHost': isHost,
@@ -526,8 +525,6 @@ class _LobbyScreenState extends State<LobbyScreen> {
 
   /// Individual item in the [buildPlayerList] [ListView]
   Widget buildItem(BuildContext context, String player, bool removed, Animation<double> animation) {
-    // Swipable tile for each player.
-    // TODO: not have dismissable for joining users.
     return Dismissible(
       key: GlobalKey(),
       resizeDuration: null,
@@ -571,7 +568,6 @@ class _LobbyScreenState extends State<LobbyScreen> {
     );
   }
 
-  //TODO: Show an indication for users themselves. Something that lets users know what their username is.
   /// [ListView] of players in the lobby.
   Widget buildPlayerList() {
     return ClipRect(child: Container(
