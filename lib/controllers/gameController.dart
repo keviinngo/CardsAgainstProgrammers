@@ -27,6 +27,8 @@ class GameController {
   void Function() updateState;
   /// Most recent winner
   String winnerUsername;
+  /// The game winner
+  String gameWinnerUsername = "";
   /// All players in the game
   List<Player> players = [];
   /// Current czar
@@ -114,6 +116,11 @@ class GameController {
         return p.name == name;
       });
       snackMessages.add(name + " left the game");
+      updateState();
+    };
+
+    connection.onGameWinner = (name) {
+      this.gameWinnerUsername = name;
       updateState();
     };
 

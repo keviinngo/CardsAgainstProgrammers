@@ -47,14 +47,16 @@ class Connection {
   void Function(String) onNewCzar;
   /// The callback that is called when new scores are set.
   void Function(Map<String, dynamic>) onNewScores;
-  /// The callback is called when the player is promoted to host
+  /// The callback that is called when the player is promoted to host
   void Function() onPromoted;
-  /// The callback is called when all players have submitted cards
+  /// The callback that is called when all players have submitted cards
   void Function(List<dynamic>) onSubmittedCards;
   /// The callback is called when a winner is picked
   void Function(String) onWinner;
-  /// The callback is called when a new call card is sent
+  /// The callback that is called when a new call card is sent
   void Function(String, int) onNewCallCard;
+  /// The callback that is called when a player has won the game
+  void Function(String) onGameWinner;
   /// Called when we receiece an "invalid_deck_id" message
   void Function() onInvalidDeckId;
 
@@ -113,9 +115,14 @@ class Connection {
       onLeft(json['username']);
     }
 
-    //Kicked
+    // Kicked
     if (json['message'] == 'kicked' && onKicked != null) {
       onKicked();
+    }
+
+    // Game winner
+    if (json['message'] == 'game_winner_annouce' && onGameWinner != null) {
+      onGameWinner(json['winner']);
     }
 
     // Swtich case for each of the possible states of the game.
